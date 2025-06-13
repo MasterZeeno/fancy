@@ -7,7 +7,7 @@ license = "MIT/Apache-2.0"
 name = "fancy"
 repository = "https://github.com/MasterZeeno/fancy"
 version = "0.0.1"
-edition = "2022"
+edition = "2021"
 build = "build.rs"
 rust-version = "1.83.0"
 
