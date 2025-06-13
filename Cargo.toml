@@ -33,7 +33,7 @@ once_cell = "1.20.2"
 output_vt100 = "0.1"
 
 [[bin]]
-name = "pastel"
+name = "fancy"
 path = "src/cli/main.rs"
 
 
@@ -53,4 +53,4 @@ strip = true
 codegen-units = 1
 
 [lints.rust]
-unexpected_cfgs = { level = "warn", check-cfg = ['cfg(pastel_normal_build)'] }
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(fancy_normal_build)'] }

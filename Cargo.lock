@@ -477,8 +477,8 @@ dependencies = [
 ]
 
 [[package]]
-name = "pastel"
-version = "0.10.0"
+name = "fancy"
+version = "0.0.1"
 dependencies = [
  "approx",
  "assert_cmd",
