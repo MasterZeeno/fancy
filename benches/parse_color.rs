@@ -1,5 +1,5 @@
 use criterion::{criterion_group, criterion_main, Criterion};
-use pastel::parser::parse_color;
+use fancy::parser::parse_color;
 
 fn criterion_benchmark(c: &mut Criterion) {
     c.bench_function("parse_hex", |b| {

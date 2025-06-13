@@ -1,8 +1,8 @@
 use crate::commands::prelude::*;
 use crate::utility::similar_colors;
 
-use pastel::ansi::Mode;
-use pastel::Format;
+use fancy::ansi::Mode;
+use fancy::Format;
 
 pub struct FormatCommand;
 

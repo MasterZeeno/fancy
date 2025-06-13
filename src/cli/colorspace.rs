@@ -1,5 +1,5 @@
-use pastel::Color;
-use pastel::{Fraction, LCh, Lab, OkLab, HSLA, RGBA};
+use fancy::Color;
+use fancy::{Fraction, LCh, Lab, OkLab, HSLA, RGBA};
 
 #[allow(clippy::type_complexity)]
 pub fn get_mixing_function(

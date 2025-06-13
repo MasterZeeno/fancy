@@ -9,7 +9,7 @@ impl GenericCommand for PickCommand {
         let count = matches.value_of("count").expect("required argument");
         let count = count
             .parse::<usize>()
-            .map_err(|_| PastelError::CouldNotParseNumber(count.into()))?;
+            .map_err(|_| FancyError::CouldNotParseNumber(count.into()))?;
 
         print_colorspectrum(config)?;
 

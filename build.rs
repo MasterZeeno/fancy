@@ -18,5 +18,5 @@ fn main() {
         generate_to(shell, &mut cmd, crate_name!(), &outdir).unwrap();
     }
 
-    println!("cargo:rustc-cfg=pastel_normal_build");
+    println!("cargo:rustc-cfg=fancy_normal_build");
 }

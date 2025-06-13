@@ -5,8 +5,8 @@ use crate::error::Result;
 use crate::hdcanvas::Canvas;
 use crate::utility::similar_colors;
 
-use pastel::Color;
-use pastel::Format;
+use fancy::Color;
+use fancy::Format;
 
 // #[derive(Debug)]
 pub struct Output<'a> {

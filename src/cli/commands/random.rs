@@ -1,7 +1,7 @@
 use crate::commands::prelude::*;
 
-use pastel::random::strategies;
-use pastel::random::RandomizationStrategy;
+use fancy::random::strategies;
+use fancy::random::RandomizationStrategy;
 
 pub struct RandomCommand;
 
@@ -12,7 +12,7 @@ impl GenericCommand for RandomCommand {
         let count = matches.value_of("number").expect("required argument");
         let count = count
             .parse::<usize>()
-            .map_err(|_| PastelError::CouldNotParseNumber(count.into()))?;
+            .map_err(|_| FancyError::CouldNotParseNumber(count.into()))?;
 
         let mut strategy: Box<dyn RandomizationStrategy> = match strategy_arg {
             "vivid" => Box::new(strategies::Vivid),

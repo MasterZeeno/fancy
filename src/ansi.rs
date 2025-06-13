@@ -282,7 +282,7 @@ impl Brush {
 
     pub fn from_environment(stream: Stream) -> Result<Self, UnknownColorModeError> {
         let mode = if atty::is(stream) {
-            let env_color_mode = std::env::var("PASTEL_COLOR_MODE").ok();
+            let env_color_mode = std::env::var("FANCY_COLOR_MODE").ok();
             match env_color_mode.as_deref() {
                 Some(mode_str) => Mode::from_mode_str(mode_str)?,
                 None => get_colormode(),

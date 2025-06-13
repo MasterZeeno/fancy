@@ -1,4 +1,4 @@
-use pastel::ansi::Brush;
+use fancy::ansi::Brush;
 
 #[derive(Debug, Clone)]
 pub struct Config<'p> {

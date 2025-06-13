@@ -7,11 +7,11 @@ function gradient() {
     local length=${#text}
 
     local colors
-    colors=$(pastel gradient -n "$length" "$color_from" "$color_to" -sLCh)
+    colors=$(fancy gradient -n "$length" "$color_from" "$color_to" -sLCh)
 
     local i=0
     for color in $colors; do
-        pastel paint -n "$color" "${text:$i:1}"
+        fancy paint -n "$color" "${text:$i:1}"
         i=$((i+1))
     done
     printf "\n"

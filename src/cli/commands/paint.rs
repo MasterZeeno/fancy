@@ -4,8 +4,8 @@ use crate::commands::prelude::*;
 
 use super::io::ColorArgIterator;
 
-use pastel::ansi::Style;
-use pastel::parser::parse_color;
+use fancy::ansi::Style;
+use fancy::parser::parse_color;
 
 pub struct PaintCommand;
 
@@ -24,7 +24,7 @@ impl GenericCommand for PaintCommand {
         };
 
         let bg = if let Some(bg) = matches.value_of("on") {
-            Some(parse_color(bg).ok_or_else(|| PastelError::ColorParseError(bg.into()))?)
+            Some(parse_color(bg).ok_or_else(|| FancyError::ColorParseError(bg.into()))?)
         } else {
             None
         };

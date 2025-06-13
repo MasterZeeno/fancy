@@ -1,21 +1,21 @@
 use assert_cmd::Command;
 
-fn pastel() -> Command {
-    let mut cmd = Command::cargo_bin("pastel").unwrap();
-    cmd.env_remove("PASTEL_COLOR_MODE");
+fn fancy() -> Command {
+    let mut cmd = Command::cargo_bin("fancy").unwrap();
+    cmd.env_remove("FANCY_COLOR_MODE");
     cmd
 }
 
 #[test]
 fn color_reads_colors_from_args() {
-    pastel()
+    fancy()
         .arg("color")
         .arg("red")
         .assert()
         .success()
         .stdout("hsl(0,100.0%,50.0%)\n");
 
-    pastel()
+    fancy()
         .arg("color")
         .arg("red")
         .arg("blue")
@@ -23,19 +23,19 @@ fn color_reads_colors_from_args() {
         .success()
         .stdout("hsl(0,100.0%,50.0%)\nhsl(240,100.0%,50.0%)\n");
 
-    pastel().arg("color").arg("no color").assert().failure();
+    fancy().arg("color").arg("no color").assert().failure();
 }
 
 #[test]
 fn color_reads_colors_from_stdin() {
-    pastel()
+    fancy()
         .arg("color")
         .write_stdin("red\nblue\n")
         .assert()
         .success()
         .stdout("hsl(0,100.0%,50.0%)\nhsl(240,100.0%,50.0%)\n");
 
-    pastel()
+    fancy()
         .arg("color")
         .write_stdin("no color")
         .assert()
@@ -44,7 +44,7 @@ fn color_reads_colors_from_stdin() {
 
 #[test]
 fn format_basic() {
-    pastel()
+    fancy()
         .arg("format")
         .arg("hex")
         .arg("red")
@@ -52,7 +52,7 @@ fn format_basic() {
         .success()
         .stdout("#ff0000\n");
 
-    pastel()
+    fancy()
         .arg("format")
         .arg("rgb")
         .arg("red")
@@ -64,7 +64,7 @@ fn format_basic() {
 
 #[test]
 fn pipe_into_format_command() {
-    let first = pastel()
+    let first = fancy()
         .arg("color")
         .arg("red")
         .arg("teal")
@@ -72,7 +72,7 @@ fn pipe_into_format_command() {
         .assert()
         .success();
 
-    pastel()
+    fancy()
         .arg("format")
         .arg("name")
         .write_stdin(String::from_utf8(first.get_output().stdout.clone()).unwrap())
@@ -83,7 +83,7 @@ fn pipe_into_format_command() {
 
 #[test]
 fn sort_by_basic() {
-    pastel()
+    fancy()
         .arg("sort-by")
         .arg("luminance")
         .arg("gray")
@@ -96,7 +96,7 @@ fn sort_by_basic() {
 
 #[test]
 fn set_basic() {
-    pastel()
+    fancy()
         .arg("set")
         .arg("hsl-hue")
         .arg("120")
@@ -105,7 +105,7 @@ fn set_basic() {
         .success()
         .stdout("hsl(120,100.0%,50.0%)\n");
 
-    pastel()
+    fancy()
         .arg("set")
         .arg("hsl-saturation")
         .arg("0.1")
@@ -114,7 +114,7 @@ fn set_basic() {
         .success()
         .stdout("hsl(0,10.0%,50.0%)\n");
 
-    pastel()
+    fancy()
         .arg("set")
         .arg("hsl-lightness")
         .arg("0.5")

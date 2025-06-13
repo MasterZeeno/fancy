@@ -2,15 +2,13 @@
 authors = ["MasterZeeno <masterzeeno@outlook.com>"]
 categories = ["command-line-utilities"]
 description = "A command-line tool to generate, analyze, convert and manipulate colors"
-homepage = "https://github.com/MasterZeeno/pastel"
+homepage = "https://github.com/MasterZeeno/fancy"
 license = "MIT/Apache-2.0"
-name = "pastel"
-readme = "README.md"
-repository = "https://github.com/MasterZeeno/pastel"
-version = "0.10.0"
-edition = "2021"
+name = "fancy"
+repository = "https://github.com/MasterZeeno/fancy"
+version = "0.0.1"
+edition = "2022"
 build = "build.rs"
-exclude = ["doc/pastel.gif"]
 rust-version = "1.83.0"
 
 [dependencies]
@@ -35,7 +33,7 @@ once_cell = "1.20.2"
 output_vt100 = "0.1"
 
 [[bin]]
-name = "pastel"
+name = "fancy"
 path = "src/cli/main.rs"
 
 
@@ -55,4 +53,4 @@ strip = true
 codegen-units = 1
 
 [lints.rust]
-unexpected_cfgs = { level = "warn", check-cfg = ['cfg(pastel_normal_build)'] }
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(fancy_normal_build)'] }

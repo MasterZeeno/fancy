@@ -1,8 +1,8 @@
 use crate::colorspace::get_mixing_function;
 use crate::commands::prelude::*;
 
-use pastel::ColorScale;
-use pastel::Fraction;
+use fancy::ColorScale;
+use fancy::Fraction;
 
 pub struct GradientCommand;
 
@@ -11,9 +11,9 @@ impl GenericCommand for GradientCommand {
         let count = matches.value_of("number").expect("required argument");
         let count = count
             .parse::<usize>()
-            .map_err(|_| PastelError::CouldNotParseNumber(count.into()))?;
+            .map_err(|_| FancyError::CouldNotParseNumber(count.into()))?;
         if count < 2 {
-            return Err(PastelError::GradientNumberMustBeLargerThanOne);
+            return Err(FancyError::GradientNumberMustBeLargerThanOne);
         }
 
         let mut print_spectrum = PrintSpectrum::Yes;
@@ -27,7 +27,7 @@ impl GenericCommand for GradientCommand {
 
         let color_count = colors.len();
         if color_count < 2 {
-            return Err(PastelError::GradientColorCountMustBeLargerThanOne);
+            return Err(FancyError::GradientColorCountMustBeLargerThanOne);
         }
 
         let mut color_scale = ColorScale::empty();

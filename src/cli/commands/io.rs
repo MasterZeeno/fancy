@@ -4,16 +4,16 @@ use clap::{ArgMatches, Values};
 
 use crate::colorpicker::{print_colorspectrum, run_external_colorpicker};
 use crate::config::Config;
-use crate::{PastelError, Result};
+use crate::{FancyError, Result};
 
-use pastel::parser::parse_color;
-use pastel::Color;
+use fancy::parser::parse_color;
+use fancy::Color;
 
 pub fn number_arg(matches: &ArgMatches, name: &str) -> Result<f64> {
     let value_str = matches.value_of(name).expect("required argument");
     value_str
         .parse::<f64>()
-        .map_err(|_| PastelError::CouldNotParseNumber(value_str.into()))
+        .map_err(|_| FancyError::CouldNotParseNumber(value_str.into()))
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -38,7 +38,7 @@ impl<'a> ColorArgIterator<'a> {
             None => {
                 use atty::Stream;
                 if atty::is(Stream::Stdin) {
-                    return Err(PastelError::ColorArgRequired);
+                    return Err(FancyError::ColorArgRequired);
                 }
                 Ok(ColorArgIterator::FromStdin)
             }
@@ -52,15 +52,15 @@ impl<'a> ColorArgIterator<'a> {
         let mut line = String::new();
         let size = lock
             .read_line(&mut line)
-            .map_err(|_| PastelError::ColorInvalidUTF8)?;
+            .map_err(|_| FancyError::ColorInvalidUTF8)?;
 
         if size == 0 {
-            return Err(PastelError::CouldNotReadFromStdin);
+            return Err(FancyError::CouldNotReadFromStdin);
         }
 
         let line = line.trim();
 
-        parse_color(line).ok_or_else(|| PastelError::ColorParseError(line.to_string()))
+        parse_color(line).ok_or_else(|| FancyError::ColorParseError(line.to_string()))
     }
 
     pub fn from_color_arg(
@@ -79,7 +79,7 @@ impl<'a> ColorArgIterator<'a> {
                 ColorArgIterator::from_color_arg(config, &color_str, print_spectrum)
             }
             color_str => {
-                parse_color(color_str).ok_or_else(|| PastelError::ColorParseError(color_str.into()))
+                parse_color(color_str).ok_or_else(|| FancyError::ColorParseError(color_str.into()))
             }
         }
     }
@@ -100,7 +100,7 @@ impl Iterator for ColorArgIterator<'_> {
 
             ColorArgIterator::FromStdin => match Self::color_from_stdin() {
                 Ok(color) => Some(Ok(color)),
-                Err(PastelError::CouldNotReadFromStdin) => None,
+                Err(FancyError::CouldNotReadFromStdin) => None,
                 err @ Err(_) => Some(err),
             },
         }

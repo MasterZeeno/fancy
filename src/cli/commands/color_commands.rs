@@ -1,8 +1,8 @@
 use crate::colorspace::get_mixing_function;
 use crate::commands::prelude::*;
 
-use pastel::ColorblindnessType;
-use pastel::Fraction;
+use fancy::ColorblindnessType;
+use fancy::Fraction;
 
 fn clamp(lower: f64, upper: f64, x: f64) -> f64 {
     f64::max(f64::min(upper, x), lower)

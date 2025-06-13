@@ -3,11 +3,11 @@ use std::process::Command;
 
 use crate::colorpicker_tools::COLOR_PICKER_TOOLS;
 use crate::config::Config;
-use crate::error::{PastelError, Result};
+use crate::error::{FancyError, Result};
 use crate::hdcanvas::Canvas;
 
-use pastel::ansi::{Brush, Stream};
-use pastel::Color;
+use fancy::ansi::{Brush, Stream};
+use fancy::Color;
 
 /// Print a color spectrum to STDERR.
 pub fn print_colorspectrum(config: &Config) -> Result<()> {
@@ -74,24 +74,24 @@ pub fn run_external_colorpicker(picker: Option<&str>) -> Result<String> {
         if tool_is_available {
             let result = Command::new(tool.command).args(tool.args).output()?;
             if !result.status.success() {
-                return Err(PastelError::ColorPickerExecutionError(
+                return Err(FancyError::ColorPickerExecutionError(
                     tool.command.to_string(),
                 ));
             }
 
             let color =
-                String::from_utf8(result.stdout).map_err(|_| PastelError::ColorInvalidUTF8)?;
+                String::from_utf8(result.stdout).map_err(|_| FancyError::ColorInvalidUTF8)?;
             let color = color.trim().to_string();
 
             // Check if tool requires some post processing of the output
             if let Some(post_process) = tool.post_process {
                 return post_process(color)
-                    .map_err(|error| PastelError::ColorParseError(error.to_string()));
+                    .map_err(|error| FancyError::ColorParseError(error.to_string()));
             } else {
                 return Ok(color);
             }
         }
     }
 
-    Err(PastelError::NoColorPickerFound)
+    Err(FancyError::NoColorPickerFound)
 }

@@ -1,6 +1,6 @@
 use crate::commands::prelude::*;
 
-use pastel::Color;
+use fancy::Color;
 
 pub struct GrayCommand;
 

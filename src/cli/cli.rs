@@ -2,7 +2,7 @@ use clap::{crate_description, crate_name, crate_version, AppSettings, Arg, Comma
 
 // Only include `colorpicker_tools` for normal builds (not when compiling `build.rs` where
 // the module machinery does not work)
-#[cfg(pastel_normal_build)]
+#[cfg(fancy_normal_build)]
 use crate::colorpicker_tools::COLOR_PICKER_TOOL_NAMES;
 
 const SORT_OPTIONS: &[&str] = &["brightness", "luminance", "hue", "chroma", "random"];
@@ -61,7 +61,7 @@ pub fn build_cli() -> Command<'static> {
                 .about("Display information about the given color")
                 .long_about("Show and display some information about the given color(s).\n\n\
                 Example:\n  \
-                  pastel color 556270 4ecdc4 c7f484 ff6b6b c44d58")
+                  fancy color 556270 4ecdc4 c7f484 ff6b6b c44d58")
                 .arg(color_arg.clone()),
         )
         .subcommand(
@@ -81,7 +81,7 @@ pub fn build_cli() -> Command<'static> {
                 .about("Generate a list of random colors")
                 .long_about("Generate a list of random colors.\n\n\
                 Example:\n  \
-                  pastel random -n 20 --strategy lch_hue")
+                  fancy random -n 20 --strategy lch_hue")
                 .arg(
                     Arg::new("strategy")
                         .long("strategy")
@@ -154,7 +154,7 @@ pub fn build_cli() -> Command<'static> {
                 .about("Sort colors by the given property")
                 .long_about("Sort a list of colors by the given property.\n\n\
                 Example:\n  \
-                  pastel random -n 20 | pastel sort-by hue | pastel format hex")
+                  fancy random -n 20 | fancy sort-by hue | fancy format hex")
                 .alias("sort")
                 .arg(
                     Arg::new("sort-order")
@@ -205,7 +205,7 @@ pub fn build_cli() -> Command<'static> {
                 .about("Convert a color to the given format")
                 .long_about("Convert the given color(s) to a specific format.\n\n\
                 Example:\n  \
-                  pastel random -n 20 | pastel format rgb")
+                  fancy random -n 20 | fancy format rgb")
                 .arg(
                     Arg::new("type")
                         .help("Output format type. Note that the 'ansi-*-escapecode' formats print \
@@ -279,8 +279,8 @@ pub fn build_cli() -> Command<'static> {
                 .long_about("Generate a sequence of colors that interpolates between the specified colors.\n\
                             The interpolation is performed in the specified color space.\n\n\
                             Example:\n  \
-                              pastel gradient --colorspace=HSL ffffcc fd8d3c\n  \
-                              pastel gradient 555ee4 white d84341 -n 15")
+                              fancy gradient --colorspace=HSL ffffcc fd8d3c\n  \
+                              fancy gradient 555ee4 white d84341 -n 15")
                 .arg(
                     Arg::new("color")
                         .value_name("color")
@@ -307,7 +307,7 @@ pub fn build_cli() -> Command<'static> {
                 .long_about(
                     "Create new colors by interpolating between two colors in the given colorspace.\n\n\
                      Example:\n  \
-                       pastel mix --colorspace=RGB red blue")
+                       fancy mix --colorspace=RGB red blue")
                 .arg(
                     colorspace_arg.clone()
                 )
@@ -335,7 +335,7 @@ pub fn build_cli() -> Command<'static> {
                     "Convert the given color to how it would look to a person with protanopia, \
                     deuteranopia, or tritanopia \n\n\
                      Example:\n  \
-                       pastel distinct 3 | pastel colorblind deuter")
+                       fancy distinct 3 | fancy colorblind deuter")
                 .arg(
                     Arg::new("type")
                         .help("The type of colorblindness that should be simulated (protanopia, \
@@ -351,7 +351,7 @@ pub fn build_cli() -> Command<'static> {
                 .about("Set a color property to a specific value")
                 .long_about("Set the given property to a specific value\n\
                 Example:\n  \
-                  pastel random | pastel set luminance 0.9")
+                  fancy random | fancy set luminance 0.9")
                 .arg(
                     Arg::new("property")
                         .help("The property that should be changed")

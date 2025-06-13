@@ -2,9 +2,9 @@ use std::io::{self, Write};
 
 use crate::commands::prelude::*;
 
-use pastel::ansi::Stream;
-use pastel::distinct::{self, DistanceMetric, IterationStatistics};
-use pastel::{Fraction, HSLA};
+use fancy::ansi::Stream;
+use fancy::distinct::{self, DistanceMetric, IterationStatistics};
+use fancy::{Fraction, HSLA};
 
 pub struct DistinctCommand;
 
@@ -135,10 +135,10 @@ impl GenericCommand for DistinctCommand {
         let count = matches.value_of("number").expect("required argument");
         let count = count
             .parse::<usize>()
-            .map_err(|_| PastelError::CouldNotParseNumber(count.into()))?;
+            .map_err(|_| FancyError::CouldNotParseNumber(count.into()))?;
 
         if count < 2 {
-            return Err(PastelError::DistinctColorCountMustBeLargerThanOne);
+            return Err(FancyError::DistinctColorCountMustBeLargerThanOne);
         }
 
         let distance_metric = match matches.value_of("metric").expect("required argument") {
@@ -157,7 +157,7 @@ impl GenericCommand for DistinctCommand {
 
         let num_fixed_colors = fixed_colors.len();
         if num_fixed_colors > count {
-            return Err(PastelError::DistinctColorFixedColorsCannotBeMoreThanCount);
+            return Err(FancyError::DistinctColorFixedColorsCannotBeMoreThanCount);
         }
 
         let mut callback: Box<dyn FnMut(&IterationStatistics)> = if verbose_output {

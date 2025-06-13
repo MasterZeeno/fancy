@@ -15,10 +15,10 @@ mod utility;
 
 use commands::Command;
 use config::Config;
-use error::{PastelError, Result};
+use error::{FancyError, Result};
 
-use pastel::ansi::{self, Brush, Mode};
-use pastel::Color;
+use fancy::ansi::{self, Brush, Mode};
+use fancy::Color;
 
 type ExitCode = i32;
 
@@ -34,24 +34,24 @@ fn write_stderr(c: Color, title: &str, message: &str) {
     .ok();
 }
 
-fn print_pastel_warning() {
+fn print_fancy_warning() {
     write_stderr(
         Color::yellow(),
-        "pastel warning",
+        "fancy warning",
         "Your terminal emulator does not appear to support 24-bit colors \
         (this means that the COLORTERM environment variable is not set to \
         'truecolor' or '24bit'). \
-        pastel will fall back to 8-bit colors, but you will only be able \
+        fancy will fall back to 8-bit colors, but you will only be able \
         to see rough approximations of the real colors.\n\n\
         To fix this, follow these steps:\n  \
-          1. Run 'pastel colorcheck' to test if your terminal\n     \
+          1. Run 'fancy colorcheck' to test if your terminal\n     \
              emulator does support 24-bit colors. If this is the\n     \
-             case, set 'PASTEL_COLOR_MODE=24bit' to force 24-bit\n     \
+             case, set 'FANCY_COLOR_MODE=24bit' to force 24-bit\n     \
              mode and to remove this warning. Alternatively, make\n     \
              sure that COLORTERM is properly set by your terminal\n     \
              emulator.\n  \
           2. If your terminal emulator does not support 24-bit\n     \
-             colors, set 'PASTEL_COLOR_MODE=8bit' to remove this\n     \
+             colors, set 'FANCY_COLOR_MODE=8bit' to remove this\n     \
              warning or try a different terminal emulator.\n\n\
         \
         For more information, see https://gist.github.com/XVilka/8346728\n",
@@ -76,7 +76,7 @@ fn run() -> Result<ExitCode> {
             "off" => None,
             "auto" => {
                 if interactive_mode {
-                    let env_color_mode = std::env::var("PASTEL_COLOR_MODE").ok();
+                    let env_color_mode = std::env::var("FANCY_COLOR_MODE").ok();
                     match env_color_mode.as_deref() {
                         Some(mode_str) => Mode::from_mode_str(mode_str)?,
                         None => {
@@ -85,7 +85,7 @@ fn run() -> Result<ExitCode> {
                                 && global_matches.subcommand_name() != Some("paint")
                                 && global_matches.subcommand_name() != Some("colorcheck")
                             {
-                                print_pastel_warning();
+                                print_fancy_warning();
                             }
                             mode
                         }
@@ -120,9 +120,9 @@ fn run() -> Result<ExitCode> {
 fn main() {
     let result = run();
     match result {
-        Err(PastelError::StdoutClosed) => {}
+        Err(FancyError::StdoutClosed) => {}
         Err(err) => {
-            write_stderr(Color::red(), "pastel error", &err.message());
+            write_stderr(Color::red(), "fancy error", &err.message());
             std::process::exit(1);
         }
         Ok(exit_code) => {

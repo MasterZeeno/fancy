@@ -1,7 +1,7 @@
 use std::io::Write;
 
-use pastel::ansi::{Brush, ToAnsiStyle};
-use pastel::Color;
+use fancy::ansi::{Brush, ToAnsiStyle};
+use fancy::Color;
 
 use crate::Result;
 

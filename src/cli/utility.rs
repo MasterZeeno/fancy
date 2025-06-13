@@ -1,5 +1,5 @@
-use pastel::named::{NamedColor, NAMED_COLORS};
-use pastel::Color;
+use fancy::named::{NamedColor, NAMED_COLORS};
+use fancy::Color;
 
 /// Returns a list of named colors, sorted by the perceived distance to the given color
 pub fn similar_colors(color: &Color) -> Vec<&NamedColor> {
