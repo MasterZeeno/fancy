@@ -30,7 +30,7 @@ update() {
   local -a PROPS=(
     homepage description license version build_in_src=true auto_update=true
     maintainer="${DIST_AUTHOR}" srcurl="${SRC_ZIP_URL}" sha256="${SRC_ZIP_SHA}"
-    breaks="${SRC_REPO_NAME}" replaces="${SRC_REPO_NAME}" depends='zenity'
+    breaks="${SRC_REPO_NAME}" replaces="${SRC_REPO_NAME}"
   )
 
   local HP="${PROPS[0]}" LIC="${PROPS[2]}"
@@ -45,17 +45,16 @@ update() {
       | sort -u | awk -F= '{if($2~/ /){print $1"=\""$2"\""}else{print $1"="$2}}' \
         > "${BUILD_SH}.tmp"
 
-  local -A SORT_MAP=(
-    [Z1]='description' [Z2]='maintainer' [Z3]='homepage'
-    [Z4]='license_file' [Z5]='license' [Z6]='version'
-    [Z7]='srcurl' [Z8]='sha256' [Z9]='auto_update'
-    [Z10]='breaks' [Z11]='replaces' [Z12]='depends'
-    [Z13]='build_in_src' )
+  local -A MAP=(
+    [001]='description' [002]='maintainer' [003]='homepage'
+    [004]='license_file' [005]='license' [006]='version'
+    [007]='srcurl' [008]='sha256' [009]='build_in_src'
+    [010]='auto_update' [011]='breaks' [012]='replaces' )
   
-  for k in Z{1..13}; do
-    grep -Eiom1 "^${PX}_${SORT_MAP[$k]^^}=.*" \
-    "${BUILD_SH}.tmp" >> "${BUILD_SH}"
-  done
+  printf '%s\n' "${!MAP[@]}" | sort -n | \
+    while IFS= read -r k; do grep -Eiom1 \
+    "^${PX}_${MAP[$k]^^}=.*" "${BUILD_SH}.tmp" \
+        >> "${BUILD_SH}"; done
   
   cat "${FUNC_SH}" >> "${BUILD_SH}"; rm -rf "${BUILD_SH}.tmp"
   print_msg "Update success! ${DIST_REPO_NAME} build script (v${LATEST})"
