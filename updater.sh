@@ -38,11 +38,5 @@ SRC_ZIP_SHA=$(curl -fsSL "${SRC_ZIP_URL}" | sha256sum | awk '{print $1}')
 } | sed -E "/^_/!d;s|(.*)=|\Utermux_pkg\1=|;s|=(.*)|='\1'|g" > "$BUILD_SH"
 
 cat "$FUNC_SH" >> "$BUILD_SH"
-
-(
-  git pull; git add .
-  git commit -m "Bumped: $BASE_MSG"
-  git push
-) 2>/dev/null
-
+(git pull; git add .; git commit -m "Bumped: $BASE_MSG"; git push) &>/dev/null
 print_msg "Updated: $BASE_MSG"
