@@ -12,7 +12,7 @@ print_msg() {
     "$CLR" "$MSG" "$CLR" "$REPO_MSG" "$CLR" "$END" && sleep "$SLP"
 }
 
-(stty cols 60 rows 30) &>/dev/null
+(stty cols 60 rows 30 || echo) &>/dev/null
 
 FUNC_SH="$(pwd)/func.sh" BUILD_SH="$(pwd)/build.sh"
 touch "$BUILD_SH" "$FUNC_SH"
