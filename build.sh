@@ -6,6 +6,10 @@ TERMUX_PKG_VERSION='0.10.0'
 TERMUX_PKG_SRCURL='https://github.com/sharkdp/pastel/archive/refs/heads/master.zip'
 TERMUX_PKG_SHA256='823b3c44a10235372fa55b5fa1d5c5565bc8ffb19a8d85846a45b2142ae1765a'
 TERMUX_PKG_MAINTAINER='MasterZeeno <masterzeeno@outlook.com>'
+TERMUX_PKG_BREAKS='pastel'
+TERMUX_PKG_REPLACES='pastel'
+TERMUX_PKG_BUILD_IN_SRC='true'
+TERMUX_PKG_AUTO_UPDATE='true'
 
 termux_step_post_get_source() {
   local DIST_REPO_OWNER="${TERMUX_PKG_MAINTAINER%% *}"
