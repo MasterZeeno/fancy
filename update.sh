@@ -1,12 +1,6 @@
 #!/usr/bin/env bash
 
-get_ver() {
-  ([[ -f "$1" ]] && \
-    cat "$1" || echo "$1") \
-    | grep -iom1 'version[ =].*' \
-    | sed 's|[^0-9.]||g'
-}
-
+get_ver() { ([[ -f "$1" ]] && cat "$1" || echo "$1") | grep -iom1 'version[ =].*' | sed 's|[^0-9.]||g'; }
 print_msg() {
   [[ -t 0 || -t 1 ]] && clear || return
   local MSG=${1^} SLP=${2:-1} CLR=32 END="!"
@@ -17,6 +11,8 @@ print_msg() {
   printf $'\e[2;%sm %s:\e[0m \e[1;%sm\uf09b %s\e[0m\e[2;%sm%s\e[0m\n' \
     "$CLR" "$MSG" "$CLR" "$REPO_MSG" "$CLR" "$END" && sleep "$SLP"
 }
+
+(stty cols 60 rows 30) &>/dev/null
 
 FUNC_SH="$(pwd)/func.sh" BUILD_SH="$(pwd)/build.sh"
 touch "$BUILD_SH" "$FUNC_SH"
