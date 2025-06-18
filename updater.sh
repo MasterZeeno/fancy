@@ -14,9 +14,9 @@ CURRENT_VER=$(get_ver "$BUILD_SH") LATEST_VER=$(get_ver "$SRC_TOML")
 BASE_MSG+=" to: v$LATEST_VER";case "${1,,}" in -f|--force) CURRENT_VER=0 ;; esac
 printf '%s\n' "$CURRENT_VER" "$LATEST_VER" \
   | sort -V | tail -n1 | grep -xq "$CURRENT_VER" && \
-    sleep 1 && print_msg "updated: $BASE_MSG" && exit
+    sleep 1 && print_msg "updated $BASE_MSG" && exit
 
-print_msg "updating: $BASE_MSG..."
+print_msg "updating $BASE_MSG..."
 
 SRC_ZIP_SHA=$(curl -fsSL "${SRC_ZIP_URL}" | sha256sum | awk '{print $1}')
 
@@ -34,4 +34,4 @@ SRC_ZIP_SHA=$(curl -fsSL "${SRC_ZIP_URL}" | sha256sum | awk '{print $1}')
 
 cat "$FUNC_SH" >> "$BUILD_SH"
 (git pull; git add .; git commit -m "Bumped: $BASE_MSG"; git push) &>/dev/null
-print_msg "updated: $BASE_MSG"
+print_msg "updated $BASE_MSG"
