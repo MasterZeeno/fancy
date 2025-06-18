@@ -77,6 +77,7 @@ if ! printf '%s\n' "$CURRENT_VER" "$LATEST_VER" \
   
   {
     git pull --quiet
+    git add -f "$BUILD_SH"
     git add .
   
     if ! git diff --cached --quiet; then
