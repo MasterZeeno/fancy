@@ -10,17 +10,21 @@ touch "$BUILD_SH" "$FUNC_SH"
 
 DIST_OWNER="MasterZeeno" DIST_REPO="fancy" SRC_OWNER="sharkdp" SRC_REPO="pastel"
 SRC_ZIP_URL="https://github.com/$SRC_OWNER/$SRC_REPO/archive/refs/heads/master.zip"
+BASE_MSG="[$DIST_OWNER/$DIST_REPO] package build script"
 
-print_msg "Checking $DIST_REPO build script for updates..."
+print_msg "Checking $BASE_MSG for updates..."
+
 SRC_TOML=$(curl -fsSL "https://raw.githubusercontent.com/$SRC_OWNER/$SRC_REPO/refs/heads/master/Cargo.toml")
 CURRENT_VER=$(get_ver "$BUILD_SH") LATEST_VER=$(get_ver "$SRC_TOML")
-case "${1,,}" in -f|--force) unset CURRENT_VER ;; esac
-printf '%s\n' "${CURRENT_VER:=0}" "${LATEST_VER:=1}" \
-  | sort -V | tail -n1 | grep -xq "${CURRENT_VER:=0}" && \
-    print_msg "latest: (v${LATEST_VER})" && exit
+BASE_MSG+=" (v$LATEST_VER)";case "${1,,}" in -f|--force) CURRENT_VER=0 ;; esac
+printf '%s\n' "$CURRENT_VER" "$LATEST_VER" \
+  | sort -V | tail -n1 | grep -xq "$CURRENT_VER" && \
+    print_msg "Latest: $BASE_MSG" && exit
+
+print_msg "Updating $BASE_MSG..."
 
 SRC_ZIP_SHA=$(curl -fsSL "${SRC_ZIP_URL}" | sha256sum | awk '{print $1}')
-print_msg "Updating ${DIST_REPO_NAME} build script to (v${LATEST_VER})..."
+
 { echo "$SRC_TOML" \
     | awk 'NR==1{next}/^ *$/{exit}NF{gsub(/\[|\]|"/,"")gsub(/ += +/,"=");print}' \
     | sed -E -e "s/^(version|description)/_\1/" \
@@ -36,10 +40,9 @@ print_msg "Updating ${DIST_REPO_NAME} build script to (v${LATEST_VER})..."
 cat "$FUNC_SH" >> "$BUILD_SH"
 
 (
-  git pull
-  git add .
-  git commit -m "Bump $DIST_REPO build script (v${LATEST_VER})"
+  git pull; git add .
+  git commit -m "Bumped: $BASE_MSG"
   git push
 ) 2>/dev/null
 
-print_msg "Update success! $DIST_REPO build script (v${LATEST_VER})"
+print_msg "Updated $BASE_MSG"
