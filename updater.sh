@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
 
 get_ver() { (cat "$1" 2>/dev/null || echo "$1") | grep -iom1 'version[ =].*' | sed 's|[^0-9.]||g'; }
-print_msg() { clear; printf $'\n \e[1;32m\uf00c %s\e[0m\n' "$1"; }
+print_msg() { clear; printf $'\n\e[1;32m \uf09b %s\e[0m\n' "$1"; }
 
 DIST_OWNER="MasterZeeno" DIST_REPO="fancy" SRC_OWNER="sharkdp" SRC_REPO="pastel"
 SRC_ZIP_URL="https://github.com/$SRC_OWNER/$SRC_REPO/archive/refs/heads/master.zip"
 FUNC_SH="$(pwd)/func.sh" BUILD_SH="$(pwd)/build.sh"; touch "$BUILD_SH" "$FUNC_SH"
-BASE_MSG="[$DIST_OWNER/$DIST_REPO]"
+BASE_MSG="$DIST_OWNER/$DIST_REPO"
 
 print_msg "Checking updates: $BASE_MSG..."
 SRC_TOML=$(curl -fsSL "https://raw.githubusercontent.com/$SRC_OWNER/$SRC_REPO/refs/heads/master/Cargo.toml")
 CURRENT_VER=$(get_ver "$BUILD_SH") LATEST_VER=$(get_ver "$SRC_TOML")
-BASE_MSG+=" (v$LATEST_VER)";case "${1,,}" in -f|--force) CURRENT_VER=0 ;; esac
+BASE_MSG+=" v$LATEST_VER";case "${1,,}" in -f|--force) CURRENT_VER=0 ;; esac
 printf '%s\n' "$CURRENT_VER" "$LATEST_VER" \
   | sort -V | tail -n1 | grep -xq "$CURRENT_VER" && \
     print_msg "Updated: $BASE_MSG" && exit
