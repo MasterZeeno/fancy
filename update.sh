@@ -9,7 +9,7 @@ get_ver() {
 
 print_msg() {
   clear
-  local MSG="${1^}" CLR=32 END=''
+  local MSG="${1^}" CLR=32 END=
   local VER="${LATEST_VER:-}"
   local REPO_MSG="$DIST_OWNER/$DIST_REPO"
   [[ -n "$VER" ]] && REPO_MSG+=" v$VER"
