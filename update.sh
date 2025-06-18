@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 get_ver() { (cat "$1" 2>/dev/null || echo "$1") | grep -iom1 'version[ =].*' | sed 's|[^0-9.]||g'; }
-print_msg() { clear; sleep 0.69; printf $'\n\e[1;32m \uf09b %s\e[0m\n' "${1^}"; sleep 0.69; }
+print_msg() { clear; sleep 0.69; printf $'\n\e[32m %s \e[1m\uf09b %s\e[0m\n' "${1^}" "$BASE_MSG"; sleep 0.69; }
 
 FUNC_SH="$(pwd)/func.sh" BUILD_SH="$(pwd)/build.sh"
 touch "$BUILD_SH" "$FUNC_SH"
