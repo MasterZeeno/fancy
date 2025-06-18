@@ -9,13 +9,13 @@ get_ver() {
 
 print_msg() {
   [[ -t 0 || -t 1 ]] && clear || return
-  local MSG="${1^}" CLR=32 END=
+  local MSG=${1^} SLP=${2:-1} CLR=32 END=
   local VER="${LATEST_VER:-}"
   local REPO_MSG="$DIST_OWNER/$DIST_REPO"
   [[ -n "$VER" ]] && REPO_MSG+=" v$VER"
   case "${MSG,,}" in *ing*) CLR=33; END="..." ;; esac
   printf $'\e[2;%sm %s:\e[0m \e[1;%sm\uf09b %s\e[0m\e[2;%sm%s\e[0m\n' \
-    "$CLR" "$MSG" "$CLR" "$REPO_MSG" "$CLR" "$END"; sleep 0.69
+    "$CLR" "$MSG" "$CLR" "$REPO_MSG" "$CLR" "$END" && sleep "$SLP"
 }
 
 FUNC_SH="$(pwd)/func.sh" BUILD_SH="$(pwd)/build.sh"
@@ -25,7 +25,7 @@ DIST_OWNER="MasterZeeno" DIST_REPO="fancy"
 DIST_EMAIL="$DIST_OWNER <${DIST_OWNER,,}@outlook.com>"
 SRC_OWNER="sharkdp" SRC_REPO="pastel"
 
-print_msg "checking updates for"
+print_msg "checking updates for" 2
 
 SRC_TOML=$(curl -fsSL "https://raw.githubusercontent.com/$SRC_OWNER/$SRC_REPO/refs/heads/master/Cargo.toml")
 CURRENT_VER=$(get_ver "$BUILD_SH") LATEST_VER=$(get_ver "$SRC_TOML")
