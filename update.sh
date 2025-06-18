@@ -45,12 +45,17 @@ if ! printf '%s\n' "$CURRENT_VER" "$LATEST_VER" \
     | awk '{print length, $0}' | sort -nr | cut -d' ' -f2- > "$BUILD_SH"
   
   cat "$FUNC_SH" >> "$BUILD_SH"
-  { git config --global user.name "$DIST_OWNER"
+  {
+    git config --global user.name "$DIST_OWNER"
     git config --global user.email "$DIST_EMAIL"
-    git pull -q
+    git pull --quiet
     git add .
-    git commit -q -m "Bumped: v$LATEST_VER"
-    git push -q }
+  
+    if ! git diff --cached --quiet; then
+      git commit --quiet -m "Bumped: v$LATEST_VER"
+      git push --quiet
+    fi
+  }
 fi
 
 print_msg "updated to latest"
