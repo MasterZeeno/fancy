@@ -38,9 +38,15 @@ if ! printf '%s\n' "$CURRENT_VER" "$LATEST_VER" \
   } | sed -E "/^_/!d; s|(.*)=|\Utermux_pkg\1=|;s|=(.*)|=\"\1\"|g" \
     | awk '{print length, $0}' | sort -nr | cut -d' ' -f2- > "$BUILD_SH"
   
-  cat "$FUNC_SH" >> "$BUILD_SH" && (git pull; git add .; git commit -m "Bumped: $BASE_MSG"; git push) &>/dev/null
+  cat "$FUNC_SH" >> "$BUILD_SH"
 fi
 
+( git config user.name "$DIST_OWNER"
+  git config user.email "${DIST_OWNER,,}@outlook.com"
+  git pull; git add .
+  git commit -m "Bumped: $BASE_MSG"
+  git push ) &>/dev/null
+  
 print_msg "updated $BASE_MSG"
 
 
