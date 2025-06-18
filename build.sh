@@ -94,11 +94,10 @@ termux_step_post_get_source() {
           local MIMETYPE=$(file --mime-type -b "${ITEM}")
           if [[ ${MIMETYPE} == text/* ]]; then
             if [[ ${ITEM##*.} == toml ]]; then 
-              local A='authors =' AVAL=$(grep -om1 "^${A}.*" "${ITEM}")
-              if [[ -n ${AVAL} ]]; then sed -Ei "$(printf \
-                "s/^${A}.*/${A} [\"%s\"]/" "${TERMUX_PKG_MAINTAINER}")" "${ITEM}"
-                print_msg "$(echo "${AVAL}" | sed -E 's/.*=.*\["(.*)"\]/\1/')" \
-                  "${TERMUX_PKG_MAINTAINER}" "${ITEM}"
+              local AUTHOR=$(grep -iom1 'authors.*' "${ITEM}" | sed -E 's|.*"(.*)".*|\1|')
+              if [[ ${AUTHOR} != ${TERMUX_PKG_MAINTAINER} ]]; then
+                sed -Ei "s|(authors.*\").*(.*\")|\1${TERMUX_PKG_MAINTAINER}\2|" "${ITEM}"
+                print_msg "${AUTHOR}" "${TERMUX_PKG_MAINTAINER}" "${ITEM}"
               fi
             fi
             if grep -q "${SRC_CASED}" "${ITEM}"; then
