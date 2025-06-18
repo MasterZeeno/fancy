@@ -1,7 +1,16 @@
 #!/usr/bin/env bash
 
 get_ver() { (cat "$1" 2>/dev/null || echo "$1") | grep -iom1 'version[ =].*' | sed 's|[^0-9.]||g'; }
-print_msg() { clear; sleep 0.69; printf $'\n\e[32m %s \e[1m\uf09b %s\e[0m\n' "${1^}" "$BASE_MSG"; sleep 0.69; }
+
+print_msg() {
+  local MSG="${1^}" END="!"
+  local VER="${LATEST_VER:-}"
+  local REPO_MSG="$DIST_OWNER/$DIST_REPO"
+  [[ -n "$VER" ]] && REPO_MSG+=" v$VER"
+  clear; case "${MSG,,}" in *ing*) END="..." ;; esac
+  printf $'\e[32m %s \e[1m\uf09b %s\e[0m\n' \
+  "$MSG" "$REPO_MSG"; sleep 0.69
+}
 
 FUNC_SH="$(pwd)/func.sh" BUILD_SH="$(pwd)/build.sh"
 touch "$BUILD_SH" "$FUNC_SH"
@@ -11,7 +20,7 @@ SRC_OWNER="sharkdp" SRC_REPO="pastel"
 
 BASE_MSG="$DIST_OWNER/$DIST_REPO"
 
-print_msg "checking updates for $BASE_MSG..."
+print_msg "checking updates for"
 
 SRC_TOML=$(curl -fsSL "https://raw.githubusercontent.com/$SRC_OWNER/$SRC_REPO/refs/heads/master/Cargo.toml")
 CURRENT_VER=$(get_ver "$BUILD_SH") LATEST_VER=$(get_ver "$SRC_TOML") BASE_MSG+=" to v$LATEST_VER"
@@ -20,7 +29,7 @@ CURRENT_VER=$(get_ver "$BUILD_SH") LATEST_VER=$(get_ver "$SRC_TOML") BASE_MSG+="
 if ! printf '%s\n' "$CURRENT_VER" "$LATEST_VER" \
 | sort -V | tail -n1 | grep -xq "$CURRENT_VER"; then
 
-  print_msg "updating $BASE_MSG..."
+  print_msg "updating"
   
   SRC_ZIP_URL="https://github.com/$SRC_OWNER/$SRC_REPO/archive/refs/heads/master.zip"
   SRC_ZIP_SHA=$(curl -fsSL "${SRC_ZIP_URL}" | sha256sum | awk '{print $1}')
@@ -47,7 +56,7 @@ fi
   git commit -m "Bumped: $BASE_MSG"
   git push ) &>/dev/null
   
-print_msg "updated $BASE_MSG"
+print_msg "updated"
 
 
 
