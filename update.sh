@@ -9,8 +9,8 @@ print_msg() {
   local REPO_MSG="$DIST_OWNER/$DIST_REPO"
   [[ -n "$VER" ]] && REPO_MSG+=" v$VER"
   case "${MSG,,}" in *ing*) CLR=33; END="..." ;; esac
-  printf $'\e[2;%sm %s:\e[0m \e[1;%sm\uf09b %s\e[2m%s\e[0m\n' \
-    "$CLR" "$MSG" "$CLR" "$REPO_MSG" "$END"; sleep 0.69
+  printf $'\e[2;%sm %s:\e[0m \e[1;%sm\uf09b %s\e[0m\e[2%sm%s\e[0m\n' \
+    "$CLR" "$MSG" "$CLR" "$REPO_MSG" "$CLR" "$END"; sleep 0.69
 }
 
 FUNC_SH="$(pwd)/func.sh" BUILD_SH="$(pwd)/build.sh"
