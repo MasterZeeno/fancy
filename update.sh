@@ -4,13 +4,13 @@ get_ver() { (cat "$1" 2>/dev/null || echo "$1") | grep -iom1 'version[ =].*' | s
 
 print_msg() {
   clear
-  local MSG="${1^}" CLR=32 END="!"
+  local MSG="${1^}" CLR=32 END=''
   local VER="${LATEST_VER:-}"
   local REPO_MSG="$DIST_OWNER/$DIST_REPO"
   [[ -n "$VER" ]] && REPO_MSG+=" v$VER"
   case "${MSG,,}" in *ing*) CLR=34; END="..." ;; esac
-  printf $'\e[2;%sm %s:\e[0m \e[1;%sm\uf09b %s%s\e[0m\n' \
-    "$CLR" "$MSG" "$CLR" "$REPO_MSG" "$END"; sleep 0.69
+  printf $'\e[2m %s:\e[0m \e[1;%sm\uf09b %s%s\e[0m\n' \
+    "$MSG" "$CLR" "$REPO_MSG" "$END"; sleep 0.69
 }
 
 FUNC_SH="$(pwd)/func.sh" BUILD_SH="$(pwd)/build.sh"
