@@ -9,7 +9,7 @@ get_ver() {
 
 print_msg() {
   [[ -t 0 || -t 1 ]] && clear || return
-  local MSG=${1^} SLP=${2:-1} CLR=32 END=
+  local MSG=${1^} SLP=${2:-1} CLR=32 END="!"
   local VER="${LATEST_VER:-}"
   local REPO_MSG="$DIST_OWNER/$DIST_REPO"
   [[ -n "$VER" ]] && REPO_MSG+=" v$VER"
@@ -56,7 +56,7 @@ fi
 ( git config user.name "$DIST_OWNER"
   git config user.email "$DIST_EMAIL"
   git pull; git add .
-  git commit -m "Bumped: $BASE_MSG"
+  git commit -m "Bumped: v$LATEST_VER"
   git push ) &>/dev/null
   
 print_msg "updated to latest"
