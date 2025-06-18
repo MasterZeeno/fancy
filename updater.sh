@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 get_ver() { (cat "$1" 2>/dev/null || echo "$1") | grep -iom1 'version[ =].*' | sed 's|[^0-9.]||g'; }
-print_msg() { clear; printf $'\n \uf00c \e[1;32m%s\e[0m\n' "$@"; sleep 0.69; }
+print_msg() { clear; printf $'\n \e[1;32m\uf00c %s\e[0m\n' "$@"; sleep 0.69; }
 
 LC_ALL="C"
 FUNC_SH="$(pwd)/func.sh"
