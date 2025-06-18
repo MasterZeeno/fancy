@@ -8,7 +8,7 @@ print_msg() {
   local REPO_MSG="$DIST_OWNER/$DIST_REPO"
   [[ -n "$VER" ]] && REPO_MSG+=" v$VER"
   clear; case "${MSG,,}" in *ing*) END="..." ;; esac
-  printf $'\e[32m %s \e[1m\uf09b %s\e[0m\n' \
+  printf $'\e[2;32m %s: \e[1;32m\uf09b %s\e[0m\n' \
   "$MSG" "$REPO_MSG"; sleep 0.69
 }
 
@@ -27,7 +27,7 @@ CURRENT_VER=$(get_ver "$BUILD_SH") LATEST_VER=$(get_ver "$SRC_TOML") BASE_MSG+="
 
 [[ "$1" == '-f' ]] && CURRENT_VER=0
 if ! printf '%s\n' "$CURRENT_VER" "$LATEST_VER" \
-| sort -V | tail -n1 | grep -xq "$CURRENT_VER"; then
+  | sort -V | tail -n1 | grep -xq "$CURRENT_VER"; then
 
   print_msg "updating"
   
