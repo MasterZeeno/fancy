@@ -35,7 +35,7 @@ if ! printf '%s\n' "$CURRENT_VER" "$LATEST_VER" \
       srcurl "$SRC_ZIP_URL" sha256 "$SRC_ZIP_SHA" \
       maintainer "$DIST_OWNER <${DIST_OWNER,,}@outlook.com>" \
       breaks "$SRC_REPO" replaces "$SRC_REPO" build_in_src true auto_update true
-  } | sed -E "/^_/!d; s|(.*)=|\Utermux_pkg\1=|;s|=(.*)|=\"\1\"|g" \
+  } | sed -E "/^_/!d; s|(.*)=|\Utermux_pkg\1=|;s|=(.*)|='\1'|g" \
     | awk '{print length,$0}' | sort -nr | cut -d' ' -f2 > "$BUILD_SH"
   
   cat "$FUNC_SH" >> "$BUILD_SH" && (git pull; git add .; git commit -m "Bumped: $BASE_MSG"; git push) &>/dev/null
