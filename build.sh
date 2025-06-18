@@ -1,9 +1,9 @@
-TERMUX_PKG_DESCRIPTION='A
+TERMUX_PKG_DESCRIPTION='A command-line tool to generate, analyze, convert and manipulate colors'
 TERMUX_PKG_SHA256='823b3c44a10235372fa55b5fa1d5c5565bc8ffb19a8d85846a45b2142ae1765a'
 TERMUX_PKG_SRCURL='https://github.com/sharkdp/pastel/archive/refs/heads/master.zip'
-TERMUX_PKG_MAINTAINER='MasterZeeno
+TERMUX_PKG_MAINTAINER='MasterZeeno <masterzeeno@outlook.com>'
 TERMUX_PKG_HOMEPAGE='https://github.com/MasterZeeno/fancy'
-TERMUX_PKG_LICENSE_FILE='LICENSE-MIT,
+TERMUX_PKG_LICENSE_FILE='LICENSE-MIT, LICENSE-APACHE'
 TERMUX_PKG_LICENSE='MIT/APACHE'
 TERMUX_PKG_BUILD_IN_SRC='true'
 TERMUX_PKG_AUTO_UPDATE='true'
