@@ -12,6 +12,35 @@ print_msg() {
     "$CLR" "$MSG" "$CLR" "$REPO_MSG" "$CLR" "$END" && sleep "$SLP"
 }
 
+# gh_auto_login() {
+  # local name="$DIST_OWNER"
+  # local email="$DIST_EMAIL"
+  # local token="${3:-$GH_PAT}"
+
+  # if [[ -z "$user" || -z "$email" || -z "$token" ]]; then
+    # echo "Usage: gh_auto_login <username> <email> <gh_token>"
+    # echo "Or set GIT_USER, GIT_EMAIL, GH_PAT env vars"
+    # return 1
+  # fi
+  
+  # for v in name email; do
+    # local -n var="$v"
+    # for s in global local; do
+      # git config --$s user.$v "$var"
+    # done
+  # done
+  
+  # # GitHub CLI auth
+  # echo "$token" | gh auth login --with-token >/dev/null 2>&1
+
+  # if gh auth status &>/dev/null; then
+    # echo "✅ GitHub CLI authenticated as $(gh api user --jq .login)"
+  # else
+    # echo "❌ GitHub CLI login failed"
+    # return 1
+  # fi
+# }
+
 FUNC_SH="$(pwd)/func.sh" BUILD_SH="$(pwd)/build.sh"
 touch "$BUILD_SH" "$FUNC_SH"
 
@@ -45,9 +74,8 @@ if ! printf '%s\n' "$CURRENT_VER" "$LATEST_VER" \
     | awk '{print length, $0}' | sort -nr | cut -d' ' -f2- > "$BUILD_SH"
   
   cat "$FUNC_SH" >> "$BUILD_SH"
+  
   {
-    git config --global user.name "$DIST_OWNER"
-    git config --global user.email "$DIST_EMAIL"
     git pull --quiet
     git add .
   
