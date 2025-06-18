@@ -8,7 +8,7 @@ SRC_ZIP_URL="https://github.com/$SRC_OWNER/$SRC_REPO/archive/refs/heads/master.z
 FUNC_SH="$(pwd)/func.sh" BUILD_SH="$(pwd)/build.sh"; touch "$BUILD_SH" "$FUNC_SH"
 BASE_MSG="$DIST_OWNER/$DIST_REPO"
 
-print_msg "checking updates: $BASE_MSG..."
+print_msg "checking updates: $BASE_MSG..."; sleep 1
 SRC_TOML=$(curl -fsSL "https://raw.githubusercontent.com/$SRC_OWNER/$SRC_REPO/refs/heads/master/Cargo.toml")
 CURRENT_VER=$(get_ver "$BUILD_SH") LATEST_VER=$(get_ver "$SRC_TOML")
 BASE_MSG+=" to: v$LATEST_VER";case "${1,,}" in -f|--force) CURRENT_VER=0 ;; esac
