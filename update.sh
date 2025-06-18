@@ -76,13 +76,12 @@ if ! printf '%s\n' "$CURRENT_VER" "$LATEST_VER" \
   cat "$FUNC_SH" >> "$BUILD_SH"
   
   {
-    git pull --quiet
-    git add -f "$BUILD_SH"
-    git add .
+    git pull --quiet origin master
+    git add -f .
   
     if ! git diff --cached --quiet; then
       git commit --quiet -m "Bumped: v$LATEST_VER"
-      git push --quiet
+      git push --quiet -f origin master
     fi
   }
 fi
