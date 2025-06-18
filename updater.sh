@@ -11,7 +11,7 @@ BASE_MSG="$DIST_OWNER/$DIST_REPO"
 print_msg "checking updates for: $BASE_MSG..."; sleep 2
 SRC_TOML=$(curl -fsSL "https://raw.githubusercontent.com/$SRC_OWNER/$SRC_REPO/refs/heads/master/Cargo.toml")
 CURRENT_VER=$(get_ver "$BUILD_SH") LATEST_VER=$(get_ver "$SRC_TOML")
-BASE_MSG+=" to: v$LATEST_VER";case "${1,,}" in -f|--force) CURRENT_VER=0 ;; esac
+BASE_MSG+=" to v$LATEST_VER"; case "${1,,}" in -f|--force) CURRENT_VER=0 ;; esac
 printf '%s\n' "$CURRENT_VER" "$LATEST_VER" \
   | sort -V | tail -n1 | grep -xq "$CURRENT_VER" && \
     sleep 1 && print_msg "updated $BASE_MSG" && exit
