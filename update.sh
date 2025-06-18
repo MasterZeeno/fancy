@@ -8,8 +8,7 @@ get_ver() {
 }
 
 print_msg() {
-  [[ -t 0 || -t 1 ]] && return
-  clear
+  [[ -t 0 || -t 1 ]] && clear || return
   local MSG="${1^}" CLR=32 END=
   local VER="${LATEST_VER:-}"
   local REPO_MSG="$DIST_OWNER/$DIST_REPO"
