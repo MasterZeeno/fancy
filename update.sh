@@ -8,7 +8,7 @@ print_msg() {
   local REPO_MSG="$DIST_OWNER/$DIST_REPO"
   [[ -n "$VER" ]] && REPO_MSG+=" v$VER"
   clear; case "${MSG,,}" in *ing*) END="..." ;; esac
-  printf $'\e[2;32m %s: \e[1;32m\uf09b %s\e[0m\n' \
+  printf $'\e[2;32m %s:\e[0m \e[1;32m\uf09b %s\e[0m\n' \
   "$MSG" "$REPO_MSG"; sleep 0.69
 }
 
