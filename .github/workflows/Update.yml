@@ -10,39 +10,41 @@ on:
   #     - '*'
 
 jobs:
-  update:
-    name: Update Fancy
+  check_status:
+    name: Check Fancy status
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - name: Run update script and check status
         id: check_status
         shell: bash
         run: |
           chmod +x update.sh
           ./update.sh -f
-
           updatable=false
           if [[ $(ls output 2>/dev/null | wc -l) -gt 1 ]]; then
             updatable=true
           fi
-
           echo "updatable=$updatable" >> "$GITHUB_OUTPUT"
-
+    outputs:
+        updatable: ${{ steps.check_status.outputs.updatable }}
+        
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    if: steps.check_status.outputs.updatable
+    steps:
       - name: Tag release
         id: tag_release
-        if: steps.check_status.outputs.updatable
         shell: bash
         run: |
           latest_tag=$(grep -Eio 'version[ =]*' build.sh | grep -Eo '[0-9.]+' | head -n1)
           echo "latest_tag=$latest_tag" >> "$GITHUB_OUTPUT"
           git tag "v$latest_tag" -m "Release version $latest_tag"
           git push origin "v$latest_tag"
-
+          
       - name: Publish Release
         uses: softprops/action-gh-release@v2
-        if: steps.check_status.outputs.updatable
         with:
           tag_name: "v${{ steps.tag_release.outputs.latest_tag }}"
           files: output/*
