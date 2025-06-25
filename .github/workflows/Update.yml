@@ -14,32 +14,39 @@ jobs:
     name: Update Fancy
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - name: Check status
-      id: check_status
-      shell: bash
-      run: |
-        chmod +x update.sh
-        ./update.sh -f
-        updatable=false
-        [[ $(ls output | wc -l || 0) -gt 1 ]] && updatable=true
-        echo "updatable=${updatable}" >> $GITHUB_OUTPUT
+      - uses: actions/checkout@v4
 
-    - name: Tag
-      if: ${{ github.env.updatable }} == "true"
-      shell: bash
-      run: |
-        latest_tag=$(cat "build.sh" | grep -iom1 'version[ =].*' | sed 's|[^0-9.]||g')
-        echo "latest_tag=${latest_tag}" >> $GITHUB_OUTPUT
-        git tag "v$latest_tag" -m "Release version $latest_tag"
-        git push --tags
-        
-    - name: Publish
-      uses: softprops/action-gh-release@v2
-      if: ${{ github.env.updatable }} == "true"
-      with:
-        tag_name: "v${{ github.env.latest_tag }}"
-        files: output/*
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Run update script and check status
+        id: check_status
+        shell: bash
+        run: |
+          chmod +x update.sh
+          ./update.sh -f
 
+          updatable=false
+          if [[ $(ls output 2>/dev/null | wc -l) -gt 1 ]]; then
+            updatable=true
+          fi
+
+          echo "updatable=$updatable" >> "$GITHUB_OUTPUT"
+
+      - name: Tag release
+        id: tag_release
+        if: steps.check_status.outputs.updatable == 'true'
+        shell: bash
+        run: |
+          latest_tag=$(grep -Eio 'version[ =][0-9.]+' build.sh | grep -o '[0-9.]*' | head -n1)
+          echo "latest_tag=$latest_tag" >> "$GITHUB_OUTPUT"
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git tag "v$latest_tag" -m "Release version $latest_tag"
+          git push origin "v$latest_tag"
+
+      - name: Publish Release
+        uses: softprops/action-gh-release@v2
+        if: steps.check_status.outputs.updatable == 'true'
+        with:
+          tag_name: "v${{ steps.tag_release.outputs.latest_tag }}"
+          files: output/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
