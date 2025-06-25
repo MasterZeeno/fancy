@@ -35,7 +35,7 @@ jobs:
         if: steps.check_status.outputs.updatable == 'true'
         shell: bash
         run: |
-          latest_tag=$(grep -Eio 'version[ =][0-9.]+' build.sh | grep -o '[0-9.]*' | head -n1)
+          latest_tag=$(grep -Eio 'version[ =]*' build.sh | grep -o '[0-9.]*' | head -n1)
           echo "latest_tag=$latest_tag" >> "$GITHUB_OUTPUT"
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
