@@ -30,8 +30,8 @@ jobs:
       shell: bash
       run: |
         latest_tag=$(cat "build.sh" | grep -iom1 'version[ =].*' | sed 's|[^0-9.]||g')
-        git tag "$latest_tag"
-        git push "$latest_tag"
+        git tag "v$latest_tag" -m "Release version $latest_tag"
+        git push --tags
         
     - name: Publish
       uses: softprops/action-gh-release@v2
