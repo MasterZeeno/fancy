@@ -63,8 +63,9 @@ print_update_msg() {
     FANCY_ARGS+=(--color=36)
   fi
   
-  fancy_print -n +d "${msg^}" 
-  fancy_print --print --no-icon +b "$bmsg" 
+  fancy_print -n +d "${msg^}:" 
+  fancy_print --print --no-icon +b "$bmsg"
+  sleep "$slp"
 }
 
 get_ver() { ([[ -f "$1" ]] && cat "$1" || echo "$1") | grep -iom1 'version[ =].*' | sed 's|[^0-9.]||g'; }
