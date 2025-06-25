@@ -30,6 +30,7 @@ jobs:
       shell: bash
       run: |
         latest_tag=$(cat "build.sh" | grep -iom1 'version[ =].*' | sed 's|[^0-9.]||g')
+        echo "latest_tag=${latest_tag}" >> $GITHUB_OUTPUT
         git tag "v$latest_tag" -m "Release version $latest_tag"
         git push --tags
         
@@ -37,6 +38,7 @@ jobs:
       uses: softprops/action-gh-release@v2
       if: ${{ github.env.updatable }} == "true"
       with:
+        tag_name: "v${{ github.env.latest_tag }}"
         files: output/*
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
