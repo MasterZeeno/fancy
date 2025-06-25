@@ -26,10 +26,10 @@ git_push_tag() {
     git config --"$s" user."$v" "${!v}"; done; done
     
   git pull -q
-  git tag "$LATEST_VER"
+  git add .
   if ! git diff --cached --quiet; then
     git commit --quiet -m "Bumped: v$LATEST_VER"
-    git push --quiet "$LATEST_VER"
+    git push --quiet
   fi
 }
 
@@ -76,8 +76,8 @@ if ! printf '%s\n' "$CURRENT_VER" "$LATEST_VER" | sort -V | tail -n1 | grep -xq 
     {
       git clone -q https://github.com/termux/termux-packages.git
       cd termux-packages
-      bash scripts/setup-android-sdk.sh
-      bash scripts/setup-ubuntu.sh
+      ./scripts/setup-android-sdk.sh
+      ./scripts/setup-ubuntu.sh
       mkdir -p "$CURR_DIR/output"
       TERM='xterm-256color' ./build-package.sh -o "$CURR_DIR/output" "$CURR_DIR"
     } || exit 1
