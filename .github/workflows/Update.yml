@@ -32,10 +32,11 @@ jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
-    if: steps.check_status.outputs.updatable
+    needs: check_status
     steps:
       - name: Tag release
         id: tag_release
+        if: steps.check_status.outputs.updatable
         shell: bash
         run: |
           latest_tag=$(grep -Eio 'version[ =]*' build.sh | grep -Eo '[0-9.]+' | head -n1)
@@ -44,6 +45,7 @@ jobs:
           git push origin "v$latest_tag"
           
       - name: Publish Release
+        if: steps.check_status.outputs.updatable
         uses: softprops/action-gh-release@v2
         with:
           tag_name: "v${{ steps.tag_release.outputs.latest_tag }}"
