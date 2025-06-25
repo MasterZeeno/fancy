@@ -79,16 +79,17 @@ git_push() {
   [[ "$(git config --"$s" user."$v")" != "${!v}" ]] && \
     git config --"$s" user."$v" "${!v}"; done; done
     
-  git pull --quiet origin master
-  git add -f .
+  git pull -q
+  git add .
   if ! git diff --cached --quiet; then
     git commit --quiet -m "Bumped: v$LATEST_VER"
-    git push --quiet -f origin master
+    git push --quiet -f
   fi
 }
 
-source "$(pwd)/printer.sh"
-FUNC_SH="$(pwd)/func.sh" BUILD_SH="$(pwd)/build.sh"
+CURR_DIR=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
+source "$CURR_DIR/printer.sh"
+FUNC_SH="$CURR_DIR/func.sh" BUILD_SH="$CURR_DIR/build.sh"
 touch "$BUILD_SH" "$FUNC_SH"
 
 DIST_OWNER="MasterZeeno" DIST_REPO="fancy"
@@ -124,12 +125,22 @@ if ! printf '%s\n' "$CURRENT_VER" "$LATEST_VER" | sort -V | tail -n1 | grep -xq 
     | awk '{print length, $0}' | sort -nr | cut -d' ' -f2- > "$BUILD_SH"
   
   cat "$FUNC_SH" >> "$BUILD_SH"
-  git_push
+  
+  if [[ -s "$BUILD_SH" ]]; then
+    {
+      git clone -q https://github.com/termux/termux-packages.git
+      cd termux-packages
+      ./setup-ubuntu.sh
+      mkdir -p "$CURR_DIR/output"
+      ./build-package.sh -o "$CURR_DIR/output" "$CURR_DIR"
+    } || exit 1
+  fi
 fi
 
 print_update_msg "updated"
-
-
+# git_push
+cd "$CURR_DIR"
+exit 0
 
 
 

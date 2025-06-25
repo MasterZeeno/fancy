@@ -1,0 +1,36 @@
+name: Update
+
+on:
+  workflow_dispatch:
+  # pull_request:
+  # push:
+  #   branches:
+  #     - master
+  #   tags:
+  #     - '*'
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Extract crate information
+      id: check_status
+      shell: bash
+      run: |
+        chmod +x update.sh
+        ./update.sh -f
+        updatable=false
+        [[ $(ls output | wc -l || 0) -gt 1 ]] && updatable=true
+        echo "updatable=${updatable}" >> $GITHUB_OUTPUT
+    outputs:
+      updatable: ${{ steps.check_status.outputs.updatable }}
+
+    - name: Publish
+      uses: softprops/action-gh-release@v2
+      if: steps.check_status.outputs.updatable == true
+      with:
+        files: output/*
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
