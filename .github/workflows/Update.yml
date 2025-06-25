@@ -11,10 +11,11 @@ on:
 
 jobs:
   update:
+    name: Update Fancy
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - name: Extract crate information
+    - name: Check status
       id: check_status
       shell: bash
       run: |
@@ -23,12 +24,10 @@ jobs:
         updatable=false
         [[ $(ls output | wc -l || 0) -gt 1 ]] && updatable=true
         echo "updatable=${updatable}" >> $GITHUB_OUTPUT
-    outputs:
-      updatable: ${{ steps.check_status.outputs.updatable }}
-
+      
     - name: Publish
       uses: softprops/action-gh-release@v2
-      if: steps.check_status.outputs.updatable == true
+      if: ${{ github.env.updatable }} == "true"
       with:
         files: output/*
       env:
