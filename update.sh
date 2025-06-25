@@ -81,7 +81,7 @@ if ! printf '%s\n' "$CURRENT_VER" "$LATEST_VER" | sort -V | tail -n1 | grep -xq 
       bash scripts/setup-android-sdk.sh
       bash scripts/setup-ubuntu.sh
       mkdir -p "$CURR_DIR/output"
-      ./build-package.sh -o "$CURR_DIR/output" "$CURR_DIR"
+      TERM='xterm-256color' ./build-package.sh -o "$CURR_DIR/output" "$CURR_DIR"
     } || exit 1
   fi
 fi
