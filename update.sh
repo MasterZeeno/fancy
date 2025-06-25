@@ -1,80 +1,10 @@
 #!/usr/bin/env bash
 
-trans_color() {
-  local i=${1//[^0-9]/}
-  [[ -z $i ]] && i=39
-  local o=$((i%10)) b=0
-  local c d35 d95
-
-  for n in {3,9}5; do
-    local -n d="d$n"
-    d=$((i>n?i-n:n-i))
-  done
-  
-  ((d35<=d95)) && \
-    c=$((30+o)) || c=$((90+o))
-  
-  for v in {N,B,D,I}; do
-    local -n V=$v; ((b++))
-    V=$(printf $'\e[0;%s;%sm' $b $c)
-  done
-}
-
-print_msg() {
-  [[ -t 0 || -t 1 ]] && clear || return
-  local msg="${1:?}" head="${2:-}"
-  local clr=${3:-} slp=${4:-1}
-  local tail= ic=
-  
-  case "${msg,,}${head,,}" in
-    *ing*)
-      ic=$' \UF0674 '
-      clr=33
-      tail='...'
-      ;;
-    *success*|*updated*)
-      ic=$' \UF012C '
-      clr=32
-      ;;
-    *fail*|*error*)
-      ic=$' \UF0156 '
-      clr=31
-      ;;
-    *)
-      clr=39
-      ;;
-  esac
-  
-  trans_color "$clr"
-  echo -e "${D} ${msg^} ${B}${ic:-}${head-}${D}${end}"
-  sleep $slp
-}
-
-print_update_msg() {
-  local msg="${1:?}" slp="${2:-1}"
-  local bmsg="$DIST_OWNER/$DIST_REPO"
-  
-  [[ -z "${LATEST_VER:-}" ]] || bmsg+=" v$LATEST_VER"
-  
-  FANCY_ARGS=(--no-print +b)
-  if [[ "${msg,,}" =~ ^updated ]]; then
-    FANCY_ARGS+=(--preset=success)
-  else
-    FANCY_ARGS+=(--color=36)
-  fi
-  
-  clear
-  fancy_print -n +d "${msg^}:" 
-  fancy_print --print --no-icon +b "$bmsg"
-  sleep "$slp"
-}
-
 get_ver() { ([[ -f "$1" ]] && cat "$1" || echo "$1") | grep -iom1 'version[ =].*' | sed 's|[^0-9.]||g'; }
-
 git_push() {
   local name="${1:-$DIST_OWNER}"
   local email="${2:-$DIST_EMAIL}"
-
+  
   for v in name email; do for s in global local; do
   [[ "$(git config --"$s" user."$v")" != "${!v}" ]] && \
     git config --"$s" user."$v" "${!v}"; done; done
@@ -127,6 +57,8 @@ if ! printf '%s\n' "$CURRENT_VER" "$LATEST_VER" | sort -V | tail -n1 | grep -xq 
   cat "$FUNC_SH" >> "$BUILD_SH"
   
   if [[ -s "$BUILD_SH" ]]; then
+    print_update_msg "updated"
+    git_push
     {
       git clone -q https://github.com/termux/termux-packages.git
       cd termux-packages
@@ -137,8 +69,6 @@ if ! printf '%s\n' "$CURRENT_VER" "$LATEST_VER" | sort -V | tail -n1 | grep -xq 
   fi
 fi
 
-print_update_msg "updated"
-# git_push
 cd "$CURR_DIR"
 exit 0
 
