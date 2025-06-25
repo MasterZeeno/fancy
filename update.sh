@@ -63,6 +63,7 @@ print_update_msg() {
     FANCY_ARGS+=(--color=36)
   fi
   
+  clear
   fancy_print -n +d "${msg^}:" 
   fancy_print --print --no-icon +b "$bmsg"
   sleep "$slp"
