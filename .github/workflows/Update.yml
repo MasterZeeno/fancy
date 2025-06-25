@@ -42,7 +42,7 @@ jobs:
 
       - name: Publish Release
         uses: softprops/action-gh-release@v2
-        if: steps.check_status.outputs.updatable == 'true'
+        if: steps.tag_release.outputs.latest_tag != ''
         with:
           tag_name: "v${{ steps.tag_release.outputs.latest_tag }}"
           files: output/*
