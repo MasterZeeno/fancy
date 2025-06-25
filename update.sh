@@ -17,7 +17,7 @@ print_update_msg() {
   fancy_print -n +d "${msg^}" 
   fancy_print --print --no-icon +b "$bmsg" 
 }
-git_push_tag() {
+git_push() {
   local name="${1:-$DIST_OWNER}"
   local email="${2:-$DIST_EMAIL}"
   
@@ -82,7 +82,7 @@ if ! printf '%s\n' "$CURRENT_VER" "$LATEST_VER" | sort -V | tail -n1 | grep -xq 
       TERM='xterm-256color' ./build-package.sh -o "$CURR_DIR/output" "$CURR_DIR"
     } || exit 1
     print_update_msg "updated"
-    git_push_tag
+    git_push
   fi
 fi
 
