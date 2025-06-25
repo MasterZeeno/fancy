@@ -1,6 +1,22 @@
 #!/usr/bin/env bash
 
 get_ver() { ([[ -f "$1" ]] && cat "$1" || echo "$1") | grep -iom1 'version[ =].*' | sed 's|[^0-9.]||g'; }
+print_update_msg() {
+  local msg="${1:?}" slp="${2:-1}"
+  local bmsg="$DIST_OWNER/$DIST_REPO"
+  
+  [[ -z "${LATEST_VER:-}" ]] || bmsg+=" v$LATEST_VER"
+  
+  FANCY_ARGS=(--no-print +b)
+  if [[ "${msg,,}" =~ ^updated ]]; then
+    FANCY_ARGS+=(--preset=success)
+  else
+    FANCY_ARGS+=(--color=36)
+  fi
+  
+  fancy_print -n +d "${msg^}" 
+  fancy_print --print --no-icon +b "$bmsg" 
+}
 git_push() {
   local name="${1:-$DIST_OWNER}"
   local email="${2:-$DIST_EMAIL}"
