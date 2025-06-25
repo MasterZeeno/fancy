@@ -127,7 +127,7 @@ if ! printf '%s\n' "$CURRENT_VER" "$LATEST_VER" | sort -V | tail -n1 | grep -xq 
   git_push
 fi
 
-print_update_msg "updated to latest"
+print_update_msg "updated"
 
 
 
