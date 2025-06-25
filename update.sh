@@ -17,7 +17,7 @@ print_update_msg() {
   fancy_print -n +d "${msg^}" 
   fancy_print --print --no-icon +b "$bmsg" 
 }
-git_push() {
+git_push_tag() {
   local name="${1:-$DIST_OWNER}"
   local email="${2:-$DIST_EMAIL}"
   
@@ -26,10 +26,10 @@ git_push() {
     git config --"$s" user."$v" "${!v}"; done; done
     
   git pull -q
-  git add .
+  git tag "$LATEST_VER"
   if ! git diff --cached --quiet; then
     git commit --quiet -m "Bumped: v$LATEST_VER"
-    git push --quiet -f
+    git push --quiet "$LATEST_VER"
   fi
 }
 
@@ -73,8 +73,6 @@ if ! printf '%s\n' "$CURRENT_VER" "$LATEST_VER" | sort -V | tail -n1 | grep -xq 
   cat "$FUNC_SH" >> "$BUILD_SH"
   
   if [[ -s "$BUILD_SH" ]]; then
-    print_update_msg "updated"
-    git_push
     {
       git clone -q https://github.com/termux/termux-packages.git
       cd termux-packages
@@ -83,6 +81,8 @@ if ! printf '%s\n' "$CURRENT_VER" "$LATEST_VER" | sort -V | tail -n1 | grep -xq 
       mkdir -p "$CURR_DIR/output"
       TERM='xterm-256color' ./build-package.sh -o "$CURR_DIR/output" "$CURR_DIR"
     } || exit 1
+    print_update_msg "updated"
+    git_push_tag
   fi
 fi
 
