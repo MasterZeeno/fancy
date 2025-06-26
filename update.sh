@@ -118,7 +118,7 @@ build_fancy() {
 
   if [[ "$RUNNER" == "archlinux" ]]; then
     $SUDO sed -i "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf
-    install_pkgs go lzip cmake git-lfs multilib-devel fontconfig \
+    install_pkgs go lzip cmake git-lfs fontconfig \
                   ttf-droid python-pyelftools android-tools android-udev
     local -a packages=(
       ncurses5-compat-libs makedepend python2
