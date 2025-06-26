@@ -41,7 +41,7 @@ termux_step_post_get_source() {
     local DIRXPR=$(printf "s|%s|${BY}\$%s${BG}|" "${TERMUX_PKG_SRCDIR}" 'SRCDIR')
       
     printf " ${BG}%s${R}\n" "${I} ${head^}"
-    [[ $# -eq 1 ]] && { sleep 1; return; }
+    [[ $# -eq 1 ]] && return
     
     local icon="${S}" key='string'
     local -a paths=('file')
@@ -65,7 +65,7 @@ termux_step_post_get_source() {
         "${icon} ${v^} ${key^}" "${var}"
     done
     
-    echo; sleep 0.32
+    echo
   }
   
   echo
