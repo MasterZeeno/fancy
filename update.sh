@@ -110,12 +110,16 @@ build_fancy() {
   fi
   
   [[ -d "$MAIN_DIR/$BUILD_REPO" ]] || \
-    git clone "https://github.com/$BUILD_OWNER/$BUILD_REPO.git"
+    git clone --quiet "https://github.com/$BUILD_OWNER/$BUILD_REPO.git"
   cd "$MAIN_DIR/$BUILD_REPO" && git pull &>/dev/null || exit 1
   
   export TERM="${TERM:-"xterm-256color"}"
   
-  cd "$MAIN_DIR/$BUILD_REPO/scripts" && ./setup-$RUNNER.sh &>/dev/null
+  cd "$MAIN_DIR/$BUILD_REPO/scripts" && . ./properties.sh
+  [[ ! -d "${NDK:-}" || ! -d "${ANDROID_HOME:-}" ]] \
+    && ./setup-android-sdk.sh &>/dev/null
+  ./setup-$RUNNER.sh &>/dev/null
+
   if [[ "$RUNNER" == "archlinux" ]]; then
     $SUDO sed -i "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf
     local -a packages=(ncurses5-compat-libs makedepend python2)
@@ -126,7 +130,7 @@ build_fancy() {
       $SUDO yay -S "${install_opts[@]}" "${packages[@]}" &>/dev/null
     else
       for package in "${packages[@]}"; do
-        git clone https://aur.archlinux.org/"$package"
+        git clone --quiet https://aur.archlinux.org/"$package"
         cd "$package" || exit 1
         makepkg -si --skippgpcheck "${install_opts[@]}" &>/dev/null
         cd - || exit 1
@@ -241,7 +245,6 @@ if ! printf '%s\n' "$CURRENT_VERSION" "$LATEST_VERSION" | sort -V | tail -n1 | g
   } | sed -E "/^_/!d; s|(.*)=|\Utermux_pkg\1=|;s|=(.*)|=\"\1\"|g" \
     | awk '{print length, $0}' | sort -nr | cut -d' ' -f2- > "$BUILD_SH"
     awk 'BEGIN{n=0}/^ *$/{n++}n>=1' "$FUNCS_SH" >> "$BUILD_SH"
-    # cat "$FUNCS_SH" >> "$BUILD_SH"
     [[ -s "$BUILD_SH" ]] && build_fancy
 fi
 
