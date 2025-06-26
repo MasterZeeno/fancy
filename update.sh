@@ -197,6 +197,7 @@ publish_fancy() {
 
 install_pkgs awk curl gh git grep sed sha256sum jq
 print_update_msg "checking updates for" 2
+gh_login
 git pull &>/dev/null || exit 1
 
 SRC_TOML=$(curl -fsSL "https://raw.githubusercontent.com/$SRC_OWNER/$SRC_REPO/refs/heads/master/Cargo.toml")
