@@ -115,9 +115,10 @@ build_fancy() {
   
   export TERM="${TERM:-"xterm-256color"}"
   
-  cd "$MAIN_DIR/$BUILD_REPO/scripts" && . ./properties.sh
+  cd "$MAIN_DIR/$BUILD_REPO/scripts" && source properties.sh
   [[ ! -d "${NDK:-}" || ! -d "${ANDROID_HOME:-}" ]] \
     && ./setup-android-sdk.sh &>/dev/null
+
   ./setup-$RUNNER.sh &>/dev/null
 
   if [[ "$RUNNER" == "archlinux" ]]; then
