@@ -4,8 +4,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  update:
-    name: Check Fancy status
+  update_fancy:
     runs-on: ubuntu-latest
     defaults:
       shell: bash
@@ -27,21 +26,22 @@ jobs:
       - name: Update Fancy
         if: steps.check_status.outputs.UPDATABLE
         id: create_deb
-        shell: bash
         run: |
-          git clone -q https://github.com/termux/termux-packages.git
+          git clone https://github.com/termux/termux-packages.git
           cd termux-packages
           
           for script in scripts/setup-{android-sdk,ubuntu}.sh
-            do [[ -x "$script" ]] && bash "$script"; done
+            do [[ -x "$script" ]] && ./"$script"; done
           
           : "${TERM:=xterm-256color}"
           export TERM= ./build-package.sh \
             -o "${{ steps.check_status.outputs.OUT_DIR }}" \
               "${{ steps.check_status.outputs.MAIN_DIR }}"
-              
-          [[ $(ls "${{ steps.check_status.outputs.OUT_DIR }}" | wc -l) -gt 1 ]] \
-            && echo "RELEASE=true" >> "$GITHUB_OUTPUT"
+          
+          RELEASE_FILES=($(find "${{ steps.check_status.outputs.OUT_DIR }}" -mindepth 1 -type f))
+          if [[ "${#RELEASE_FILES[@]}" -gt 1 ]]; then
+            echo "RELEASE=true" >> "$GITHUB_OUTPUT"
+          fi
       
       - name: Tag Release
         if: steps.create_deb.outputs.RELEASE

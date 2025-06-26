@@ -39,7 +39,7 @@ termux_step_post_get_source() {
     local I=$'\uf00c' D=$'\uea83' S=$'\ueb8d' F=$'\uf4a5'
     local DG=$'\e[2;32m' BG=$'\e[1;32m' BY=$'\e[1;33m'
     local DIRXPR=$(printf "s|%s|${BY}\$%s${BG}|;" \
-      "${HOME}" 'HOME' "${PREFIX}" 'PREFIX')
+      "${TERMUX_PKG_SRCDIR}" 'SRCDIR')
 
     printf " ${BG}%s${R}\n" "${I} ${head^}"
     [[ $# -eq 1 ]] && { sleep 1; clear; return; }

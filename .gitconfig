@@ -1,0 +1,12 @@
+[dist]
+	owner = MasterZeeno
+	repo = fancy
+	email = masterzeeno@outlook.com
+[src]
+	owner = sharkdp
+	repo = pastel
+[build]
+	owner = termux
+	repo = termux-packages
+[github]
+	token = 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
