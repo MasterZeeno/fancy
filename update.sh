@@ -115,7 +115,7 @@ build_fancy() {
   
   export TERM="${TERM:-"xterm-256color"}"
   
-  cd "$MAIN_DIR/$BUILD_REPO/scripts" && source properties.sh
+  cd "$MAIN_DIR/$BUILD_REPO/scripts"
   [[ ! -d "${NDK:-}" || ! -d "${ANDROID_HOME:-}" ]] \
     && ./setup-android-sdk.sh &>/dev/null
 
@@ -222,7 +222,7 @@ publish_fancy() {
   done
 }
 
-install_pkgs curl gh git jq
+install_pkgs curl gh git jq tar unzip zip
 print_update_msg "checking updates for" 2
 gh_login || true
 git pull &>/dev/null || exit 1
