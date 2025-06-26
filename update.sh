@@ -118,21 +118,21 @@ build_fancy() {
 
   if [[ "$RUNNER" == "archlinux" ]]; then
     $SUDO sed -i "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf
-    install_pkgs go lzip cmake git-lfs python3 android-tools android-udev
+    install_pkgs go lzip cmake git-lfs python3
     local -a packages=(
       ncurses5-compat-libs makedepend python2
       aosp-devel xml2 lineageos-devel lib32-ncurses5-compat-libs
     )
     local -a install_opts=(--noconfirm --needed)
     if command -v paru &>/dev/null; then
-      $SUDO paru -S "${install_opts[@]}" "${packages[@]}"
+      $SUDO paru -S "${install_opts[@]}" "${packages[@]}" &>/dev/null
     elif command -v yay &>/dev/null; then
-      $SUDO yay -S "${install_opts[@]}" "${packages[@]}"
+      $SUDO yay -S "${install_opts[@]}" "${packages[@]}" &>/dev/null
     else
       for package in "${packages[@]}"; do
         git clone --quiet https://aur.archlinux.org/"$package"
         cd "$package" || exit 1
-        makepkg -si --skippgpcheck "${install_opts[@]}"
+        makepkg -si --skippgpcheck "${install_opts[@]}" &>/dev/null
         cd - || exit 1
         rm -rf "$package"
       done
