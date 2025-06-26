@@ -183,7 +183,7 @@ termux_step_post_get_source() {
     done
   done
 
-  print_msg 'Start building process...'
+  print_msg 'Successfully renamed package'
   echo
 }
 
@@ -191,10 +191,10 @@ termux_step_pre_configure() {
   termux_setup_rust
   : "${CARGO_HOME:=${HOME}/.cargo}"
   export CARGO_HOME
-  cargo -q fmt -- --check
-  # cargo clippy --locked --all-targets
-  # cargo test --locked
-  # cargo fetch --locked --target "${CARGO_TARGET_NAME}"
+  cargo fmt -- --check
+  cargo -q clippy --locked --all-targets
+  cargo -q test --locked
+  cargo -q fetch --locked --target "${CARGO_TARGET_NAME}"
 }
 
 termux_step_make() {
