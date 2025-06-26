@@ -118,11 +118,7 @@ build_fancy() {
 
   if [[ "$RUNNER" == "archlinux" ]]; then
     $SUDO sed -i "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf
-    install_pkgs go lzip cmake git-lfs python3
-    local -a packages=(
-      ncurses5-compat-libs makedepend python2
-      aosp-devel xml2 lineageos-devel lib32-ncurses5-compat-libs
-    )
+    local -a packages=(ncurses5-compat-libs makedepend python2)
     local -a install_opts=(--noconfirm --needed)
     if command -v paru &>/dev/null; then
       $SUDO paru -S "${install_opts[@]}" "${packages[@]}" &>/dev/null
@@ -223,7 +219,7 @@ publish_fancy() {
   done
 }
 
-install_pkgs curl gh git jq tar unzip zip
+install_pkgs curl gh git jq python3 tar unzip zip
 print_update_msg "checking updates for" 2
 gh_login && git pull --quiet &>/dev/null || exit 1
 
