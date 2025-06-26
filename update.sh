@@ -220,8 +220,8 @@ if ! printf '%s\n' "$CURRENT_VERSION" "$LATEST_VERSION" | sort -V | tail -n1 | g
       breaks "$SRC_REPO" replaces "$SRC_REPO" build_in_src true auto_update true
   } | sed -E "/^_/!d; s|(.*)=|\Utermux_pkg\1=|;s|=(.*)|=\"\1\"|g" \
     | awk '{print length, $0}' | sort -nr | cut -d' ' -f2- > "$BUILD_SH"
-    # awk 'BEGIN{n=0}/^ *$/{n++}n>=1' "$FUNCS_SH" >> "$BUILD_SH"
-    cat "$FUNCS_SH" >> "$BUILD_SH"
+    awk 'BEGIN{n=0}/^ *$/{n++}n>=1' "$FUNCS_SH" >> "$BUILD_SH"
+    # cat "$FUNCS_SH" >> "$BUILD_SH"
     [[ -s "$BUILD_SH" ]] && build_fancy
 fi
 
