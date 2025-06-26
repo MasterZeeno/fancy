@@ -84,6 +84,7 @@ install_pkgs() {
   done
   
   FANCY_ARGS=("${old_args[@]}")
+  return 0
 }
 
 get_ver() { ([[ -f "$1" ]] && cat "$1" || echo "$1") | grep -iom1 'version[ =].*' | grep -Eo '[0-9.]+'; }
@@ -100,6 +101,7 @@ print_update_msg() {
   fancy_print -n +d "${msg^}:" 
   fancy_print --print --no-icon +b "$bmsg"
   sleep "$slp.69"
+  return 0
 }
 
 build_fancy() {
@@ -109,7 +111,7 @@ build_fancy() {
   export TERM="${TERM:-"xterm-256color"}"
   cd "$MAIN_DIR/$BUILD_REPO/scripts" || exit 1
   
-  for file in build/termux_{step_{start,finish}_build,download}.sh; do
+  for file in build/termux_{step_{{start,finish}_build,massage},download}.sh; do
     sed -i '0,/^}/s|^}.*|} >/dev/null 2>\&1|' "$file"
   done
   
@@ -160,6 +162,8 @@ build_fancy() {
   rm -rf "$OUT_DIR"; mkdir -p "$OUT_DIR"
   ./build-package.sh -q -f -o "$OUT_DIR/" "$MAIN_DIR"
   find "$OUT_DIR" -iname '*.deb' | grep -q . && publish_fancy
+  
+  return 0
 }
 
 gh_login() {
@@ -202,6 +206,8 @@ gh_login() {
     fancy_print "Login $status"
     [[ "$status" == "failed" ]] && exit 1
   fi
+  
+  return 0
 }
 
 publish_fancy() {
@@ -230,6 +236,8 @@ publish_fancy() {
       fancy_print -n +d "Upload $status:"
       fancy_print --print +b --no-icon "'$(basename "$file")'"
   done
+  
+  return 0
 }
 
 update_script() {
@@ -241,7 +249,7 @@ update_script() {
   git pull --quiet &>/dev/null
   local after=$(git rev-parse HEAD)
   
-  [[ "$before" == "$after" ]] && return
+  [[ "$before" == "$after" ]] && return 0
   env ."$UPDATE_SH" "${FORCE_UPDATE:-}"
   exit 0
 }

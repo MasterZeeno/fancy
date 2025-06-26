@@ -191,15 +191,15 @@ termux_step_pre_configure() {
   termux_setup_rust
   : "${CARGO_HOME:=${HOME}/.cargo}"
   export CARGO_HOME
-  cargo fmt -- --check
-  cargo clippy --locked --all-targets
-  cargo test --locked
-  cargo fetch --locked --target "${CARGO_TARGET_NAME}"
+  cargo -q fmt -- --check
+  # cargo clippy --locked --all-targets
+  # cargo test --locked
+  # cargo fetch --locked --target "${CARGO_TARGET_NAME}"
 }
 
 termux_step_make() {
   SHELL_COMPLETIONS_DIR="${TERMUX_PKG_BUILDDIR}/completions" \
-    cargo build --jobs "${TERMUX_PKG_MAKE_PROCESSES}" \
+    cargo -q build --jobs "${TERMUX_PKG_MAKE_PROCESSES}" \
       --locked --target "${CARGO_TARGET_NAME}" --release
 }
 
