@@ -113,9 +113,8 @@ termux_step_post_get_source() {
     local R=$'\e[0m'
     local I=$'\uf00c' D=$'\uea83' S=$'\ueb8d' F=$'\uf4a5'
     local DG=$'\e[2;32m' BG=$'\e[1;32m' BY=$'\e[1;33m'
-    local DIRXPR=$(printf "s|%s|${BY}\$%s${BG}|;" \
-      "${TERMUX_PKG_SRCDIR}" 'SRCDIR')
-
+    local DIRXPR=$(printf "s|%s|${BY}\$%s${BG}|" "${TERMUX_PKG_SRCDIR}" 'SRCDIR')
+      
     printf " ${BG}%s${R}\n" "${I} ${head^}"
     [[ $# -eq 1 ]] && { sleep 1; clear; return; }
     
@@ -145,7 +144,7 @@ termux_step_post_get_source() {
   }
 
   clear
-
+  rm -rf "${TERMUX_PKG_SRCDIR}"/.git*
   for prop in REPO_{OWNER,NAME}; do
     for p in {SRC,DIST}; do
       local -n "${p}=${p}_${prop}"
