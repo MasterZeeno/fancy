@@ -41,7 +41,7 @@ termux_step_post_get_source() {
     local DIRXPR=$(printf "s|%s|${BY}\$%s${BG}|" "${TERMUX_PKG_SRCDIR}" 'SRCDIR')
       
     printf " ${BG}%s${R}\n" "${I} ${head^}"
-    [[ $# -eq 1 ]] && { sleep 1; clear; return; }
+    [[ $# -eq 1 ]] && { sleep 1; return; }
     
     local icon="${S}" key='string'
     local -a paths=('file')
@@ -68,14 +68,11 @@ termux_step_post_get_source() {
     echo; sleep 0.32
   }
 
-  clear
   rm -rf "${TERMUX_PKG_SRCDIR}"/.git*
   for prop in REPO_{OWNER,NAME}; do
     for p in {SRC,DIST}; do
       local -n "${p}=${p}_${prop}"
     done
-
-    print_msg "Renaming and replacing [${SRC}] to [${DIST}]..."
 
     find -P "${TERMUX_PKG_SRCDIR}" -mindepth 1 -readable \
       -writable ! -name '.*' | while IFS= read -r ITEM; do
@@ -85,8 +82,9 @@ termux_step_post_get_source() {
 
         if [[ ${ITEM} == *"${SRC_CASED}"* ]]; then
           local NEW_NAME="${ITEM//${SRC_CASED}/${DIST_CASED}}"
-          mv -f "${ITEM}" "${NEW_NAME}"; ITEM="${NEW_NAME}"
           print_msg "${ITEM}" "${NEW_NAME}"
+          mv -f "${ITEM}" "${NEW_NAME}"
+          ITEM="${NEW_NAME}"
         fi
 
         if [[ -f ${ITEM} ]]; then
