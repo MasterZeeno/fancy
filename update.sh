@@ -109,6 +109,10 @@ build_fancy() {
   export TERM="${TERM:-"xterm-256color"}"
   cd "$MAIN_DIR/$BUILD_REPO/scripts" || exit 1
   
+  for file in build/termux_{step_{start,finish}_build,download}.sh; do
+    sed -i '0,/^}/s|^}.*|} >/dev/null 2>\&1|' "$file"
+  done
+  
   source properties.sh &>/dev/null || true
   if [[ "$RUNNER" != "termux" ]]; then
     [[ ! -d "${NDK:-}" || ! -d "${ANDROID_HOME:-}" ]] \
@@ -220,7 +224,8 @@ publish_fancy() {
     | while IFS= read -r file; do
       gh release upload "$tag" "$file" --clobber >/dev/null \
         && status="success" || status="failed"
-        
+      
+      echo
       FANCY_ARGS=(--no-print --preset="$status")
       fancy_print -n +d "Upload $status:"
       fancy_print --print +b --no-icon "'$(basename "$file")'"
