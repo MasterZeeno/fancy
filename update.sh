@@ -65,6 +65,7 @@ install_pkgs() {
             apt-get install -yq --no-install-recommends "$pkg" &>/dev/null
           ;;
         pacman)
+          [[ "$pkg" == "gh" ]] && pkg="github-cli"
           $SUDO pacman -Syq --needed --noconfirm "$pkg" &>/dev/null
           ;;
       esac
@@ -115,6 +116,25 @@ build_fancy() {
   export TERM="${TERM:-"xterm-256color"}"
   
   cd "$MAIN_DIR/$BUILD_REPO/scripts" && ./setup-$RUNNER.sh &>/dev/null
+  if [[ "$RUNNER" == "archlinux" ]]; then
+    $SUDO sed -i "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf
+    local -a packages=(ncurses5-compat-libs makedepend python2)
+    local -a install_opts=(--noconfirm --needed)
+    if command -v paru &>/dev/null; then
+      $SUDO paru -S "${install_opts[@]}" "${packages[@]}" &>/dev/null
+    elif command -v yay &>/dev/null; then
+      $SUDO yay -S "${install_opts[@]}" "${packages[@]}" &>/dev/null
+    else
+      for package in "${packages[@]}"; do
+        git clone https://aur.archlinux.org/"$package"
+        cd "$package" || exit 1
+        makepkg -si --skippgpcheck "${install_opts[@]}" &>/dev/null
+        cd - || exit 1
+        rm -rf "$package"
+      done
+    fi
+  fi
+
   cd "$MAIN_DIR/$BUILD_REPO" && ./clean.sh &>/dev/null
   
   ./build-package.sh -f -q -o "$OUT_DIR/" "$MAIN_DIR"
