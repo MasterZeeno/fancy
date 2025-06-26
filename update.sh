@@ -123,11 +123,11 @@ build_fancy() {
 }
 
 gh_login() {
-  local status="success"
-  cd "$MAIN_DIR"
-  
   if [[ "$(gh api user --jq .login)" != "$DIST_OWNER" ]]; then
     gh auth logout &>/dev/null
+    
+    local status="success"
+    cd "$MAIN_DIR"
     
     for var in name email; do
       local val=$(git config --file "$MAIN_DIR/.cfg" user.$var)
@@ -159,11 +159,13 @@ gh_login() {
       echo "$GH_TOKEN" | gh auth login --with-token &>/dev/null
       ((try++)) && ((try>3)) && { status="failed"; break; }
     done
+    
+    [[ $? -eq 1 ]] && status="failed"
+    
+    FANCY_ARGS=(--preset="$status" +b)
+    echo; fancy_print "Login $status"
+    [[ "$status" == "failed" ]] && exit 1
   fi
-  
-  FANCY_ARGS=(--preset="$status" +b)
-  echo; fancy_print "Login $status"
-  [[ "$status" == "failed" ]] && exit 1
 }
 
 publish_fancy() {
