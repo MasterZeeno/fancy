@@ -110,13 +110,13 @@ build_fancy() {
   
   cd "$MAIN_DIR/$BUILD_REPO/scripts"
   
-  source properties.sh &>/dev/null
+  source properties.sh # &>/dev/null
   if [[ "$RUNNER" != "termux" ]]; then
     [[ ! -d "${NDK:-}" || ! -d "${ANDROID_HOME:-}" ]] \
-      && source setup-android-sdk.sh &>/dev/null
+      && source setup-android-sdk.sh # &>/dev/null
   fi
   
-  source setup-$RUNNER.sh &>/dev/null
+  source setup-$RUNNER.sh # &>/dev/null
 
   if [[ "$RUNNER" == "archlinux" ]]; then
     $SUDO sed -i "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf
