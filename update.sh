@@ -35,6 +35,7 @@ source "$FUNCS_SH"
 if [[ "$(uname -o)" == "Android" && "${PREFIX:-}" == *"com.termux"* ]]; then
   SUDO="" RUNNER="termux"
   source "$PREFIX/bin/termux-setup-package-manager" &>/dev/null || true
+  termux-wake-lock &>/dev/null || true
 else
   [[ $(id -u) -eq 0 ]] || SUDO="sudo"
   if command -v apt &>/dev/null; then
