@@ -8,5 +8,3 @@
 [build]
 	owner = termux
 	repo = termux-packages
-[github]
-	token = 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

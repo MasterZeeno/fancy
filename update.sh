@@ -9,7 +9,7 @@ clear
 MAIN_DIR=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
 OUT_DIR="$MAIN_DIR/output"; rm -rf "$OUT_DIR"
 
-for v in {dist,src,build,github}.{owner,repo,email,token} {funcs,build}.sh; do
+for v in {dist,src,build}.{owner,repo,email} {funcs,build}.sh; do
   declare val condition=false
   if [[ $v =~ \.sh$ ]]; then
     val="$MAIN_DIR/$v"
@@ -123,19 +123,35 @@ build_fancy() {
   [[ $(ls "$OUT_DIR"/ | wc -l) -gt 1 ]] && publish_fancy
 }
 
-publish_fancy() {
-  local tag="${1:-"v$LATEST_VERSION"}"
-  local remote="${2:-"origin"}"
+login_gh() {
+  install_pkgs gh
   
-  FANCY_ARGS=(+d --color=36)
-  fancy_print "Logging into github..."
+  [[ "$(gh api user --jq .login)" == "$name" ]] && return 0
   
-  local try=0
+  FANCY_ARGS=(--no-print --color=36)
+  fancy_print +d -n "Logging into"
+  fancy_print +b --print "Github"
+  
+  local token try=0
+  while true; do
+    fancy_print -n "*GH Auth Token: "
+    read -r token
+    token="${token#"${token%%[![:space:]]*}"}"
+    token="${token%"${token##*[![:space:]]}"}"
+    [[ -n "$token" ]] && break
+  done
+  
   gh config set -h github.com git_protocol https
   while ! gh auth status &>/dev/null; do
     echo "$token" | gh auth login --with-token &>/dev/null
-    ((try++)) && ((try>3)) && break
+    ((try++)) && ((try>3)) && return 1
   done
+  return 0
+}
+
+publish_fancy() {
+  local tag="${1:-"v$LATEST_VERSION"}"
+  local remote="${2:-"origin"}"
   
   local result
   [[ "$(gh api user --jq .login)" == "$name" ]] \
@@ -194,7 +210,7 @@ publish_fancy() {
   done
 }
 
-install_pkgs curl git gh awk sed grep sha256sum jq
+install_pkgs curl git awk sed grep sha256sum jq
 print_update_msg "checking updates for" 2
 
 SRC_TOML=$(curl -fsSL "https://raw.githubusercontent.com/$SRC_OWNER/$SRC_REPO/refs/heads/master/Cargo.toml")
