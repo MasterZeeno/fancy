@@ -135,7 +135,7 @@ build_fancy() {
     fi
   fi
 
-  source setup-$RUNNER.sh # &>/dev/null
+  source setup-$RUNNER.sh || true # &>/dev/null
 
   cd "$MAIN_DIR/$BUILD_REPO" && ./clean.sh &>/dev/null
   
