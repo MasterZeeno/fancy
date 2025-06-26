@@ -115,8 +115,6 @@ build_fancy() {
     [[ ! -d "${NDK:-}" || ! -d "${ANDROID_HOME:-}" ]] \
       && source setup-android-sdk.sh # &>/dev/null
   fi
-  
-  source setup-$RUNNER.sh # &>/dev/null
 
   if [[ "$RUNNER" == "archlinux" ]]; then
     $SUDO sed -i "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf
@@ -136,6 +134,8 @@ build_fancy() {
       done
     fi
   fi
+
+  source setup-$RUNNER.sh # &>/dev/null
 
   cd "$MAIN_DIR/$BUILD_REPO" && ./clean.sh &>/dev/null
   
