@@ -247,7 +247,7 @@ if ! printf '%s\n' "$CURRENT_VERSION" "$LATEST_VERSION" | sort -V | tail -n1 | g
     if [[ -s "$BUILD_SH" ]]; then
       cd "$MAIN_DIR" && git add .
       if ! git diff --cached --quiet; then
-        git commit --quiet -m "Bumped: v$LATEST_VER"
+        git commit --quiet -m "Bumped: v$LATEST_VERSION"
         git push --quiet
       fi
       
