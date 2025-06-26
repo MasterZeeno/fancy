@@ -204,12 +204,10 @@ publish_fancy() {
   local tag="v${1:-$LATEST_VERSION}"
   cd "$MAIN_DIR"
   
-  if git ls-remote --tags origin | grep -q "refs/tags/$tag$"; then
-    git tag | grep -q "^$tag$" && git tag -d "$tag"
-    git rev-parse -q --verify "refs/tags/$tag" &>/dev/null \
-      && git push origin ":refs/tags/$tag"
-    gh release view "$tag" &>/dev/null && gh release delete "$tag" -y
-  fi
+  git rev-parse -q --verify "refs/tags/$tag" &>/dev/null \
+    && git push origin ":refs/tags/$tag"
+  git tag | grep -q "^$tag$" && git tag -d "$tag"
+  gh release view "$tag" &>/dev/null && gh release delete "$tag" -y
   
   git tag "$tag"
   git push --quiet origin "$tag"
@@ -218,14 +216,14 @@ publish_fancy() {
     --target "$(git rev-parse HEAD)" \
     --repo "$USER_NAME/$USER_REPO" >/dev/null
     
-  find "$OUT_DIR" -type f -iname '*.deb' \
+  find "$OUT_DIR" -iname '*.deb' \
     | while IFS= read -r file; do
       gh release upload "$tag" "$file" --clobber >/dev/null \
         && status="success" || status="failed"
         
       FANCY_ARGS=(--no-print --preset="$status")
       fancy_print -n +d "Upload $status:"
-      fancy_print --print +b --no-icon "$file"
+      fancy_print --print +b --no-icon "'$(basename "$file")'"
   done
 }
 
