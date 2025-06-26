@@ -101,25 +101,22 @@ print_update_msg() {
 
 build_fancy() {
   mkdir -p "$OUT_DIR"
-  gh_login
-  
-  cd "$MAIN_DIR" && git add .
-  if ! git diff --cached --quiet; then
-    git commit --quiet -m "Bumped: v$LATEST_VER"
-    git push --quiet
-  fi
   
   [[ -d "$MAIN_DIR/$BUILD_REPO" ]] || \
     git clone --quiet "https://github.com/$BUILD_OWNER/$BUILD_REPO.git"
-  cd "$MAIN_DIR/$BUILD_REPO" && git pull &>/dev/null || exit 1
+  cd "$MAIN_DIR/$BUILD_REPO" && git pull --quiet &>/dev/null || exit 1
   
   export TERM="${TERM:-"xterm-256color"}"
   
   cd "$MAIN_DIR/$BUILD_REPO/scripts"
-  [[ ! -d "${NDK:-}" || ! -d "${ANDROID_HOME:-}" ]] \
-    && ./setup-android-sdk.sh &>/dev/null
-
-  ./setup-$RUNNER.sh &>/dev/null
+  
+  source properties.sh &>/dev/null
+  if [[ "$RUNNER" != "termux" ]]; then
+    [[ ! -d "${NDK:-}" || ! -d "${ANDROID_HOME:-}" ]] \
+      && source setup-android-sdk.sh &>/dev/null
+  fi
+  
+  source setup-$RUNNER.sh &>/dev/null
 
   if [[ "$RUNNER" == "archlinux" ]]; then
     $SUDO sed -i "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf
@@ -195,7 +192,7 @@ gh_login() {
 
 publish_fancy() {
   local tag="v${1:-$LATEST_VERSION}"
-  gh_login && cd "$MAIN_DIR"
+  cd "$MAIN_DIR"
   
   if git ls-remote --tags origin | grep -q "refs/tags/$tag$"; then
     git tag | grep -q "^$tag$" && git tag -d "$tag"
@@ -224,8 +221,7 @@ publish_fancy() {
 
 install_pkgs curl gh git jq tar unzip zip
 print_update_msg "checking updates for" 2
-gh_login || true
-git pull &>/dev/null || exit 1
+gh_login && git pull --quiet &>/dev/null || exit 1
 
 SRC_TOML=$(curl -fsSL "https://raw.githubusercontent.com/$SRC_OWNER/$SRC_REPO/refs/heads/master/Cargo.toml")
 LATEST_VERSION=$(get_ver "$SRC_TOML") CURRENT_VERSION=0
@@ -246,7 +242,16 @@ if ! printf '%s\n' "$CURRENT_VERSION" "$LATEST_VERSION" | sort -V | tail -n1 | g
   } | sed -E "/^_/!d; s|(.*)=|\Utermux_pkg\1=|;s|=(.*)|=\"\1\"|g" \
     | awk '{print length, $0}' | sort -nr | cut -d' ' -f2- > "$BUILD_SH"
     awk 'BEGIN{n=0}/^ *$/{n++}n>=1' "$FUNCS_SH" >> "$BUILD_SH"
-    [[ -s "$BUILD_SH" ]] && build_fancy
+    
+    if [[ -s "$BUILD_SH" ]]; then
+      cd "$MAIN_DIR" && git add .
+      if ! git diff --cached --quiet; then
+        git commit --quiet -m "Bumped: v$LATEST_VER"
+        git push --quiet
+      fi
+      
+      build_fancy
+    fi
 fi
 
 print_update_msg "updated"
