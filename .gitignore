@@ -1,2 +1,15 @@
 /termux-packages/
 /output/
+
+# Misc archives
+/*\.deb
+/*\.zip
+/*\.tar
+/*\.tar\.*
+
+# GitHub Actions build artifacts
+debs*
+checksum*
+
+# Temp .git directories for packages built from local sources "file://"
+/*.git

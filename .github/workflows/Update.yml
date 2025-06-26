@@ -1,64 +1,64 @@
-name: Update
+# name: Update
 
-on:
-  workflow_dispatch:
+# on:
+  # workflow_dispatch:
 
-jobs:
-  update_fancy:
-    runs-on: ubuntu-latest
-    defaults:
-      shell: bash
-    steps:
-      - uses: actions/checkout@v4
-      - name: Check Status
-        id: check_status
-        run: |
-          chmod +x update.sh && source update.sh -f
-          LATEST_VERSION="${LATEST_VERSION:-$(grep -Eiom1 'version[ =]*' build.sh | grep -Eo '[0-9.]+')}"
-          MAIN_DIR="${MAIN_DIR:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
-          OUT_DIR="${OUT_DIR:-"$MAIN_DIR/output"}"
+# jobs:
+  # update_fancy:
+    # runs-on: ubuntu-latest
+    # defaults:
+      # shell: bash
+    # steps:
+      # - uses: actions/checkout@v4
+      # - name: Check Status
+        # id: check_status
+        # run: |
+          # chmod +x update.sh && source update.sh -f
+          # LATEST_VERSION="${LATEST_VERSION:-$(grep -Eiom1 'version[ =]*' build.sh | grep -Eo '[0-9.]+')}"
+          # MAIN_DIR="${MAIN_DIR:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
+          # OUT_DIR="${OUT_DIR:-"$MAIN_DIR/output"}"
    
-          for arg in LATEST_VERSION MAIN_DIR OUT_DIR; do
-           echo "$arg=${!arg}" >> "$GITHUB_OUTPUT"; done
+          # for arg in LATEST_VERSION MAIN_DIR OUT_DIR; do
+           # echo "$arg=${!arg}" >> "$GITHUB_OUTPUT"; done
            
-         [[ -d "$OUT_DIR" ]] && echo "UPDATABLE=true" >> "$GITHUB_OUTPUT"
+         # [[ -d "$OUT_DIR" ]] && echo "UPDATABLE=true" >> "$GITHUB_OUTPUT"
           
-      - name: Update Fancy
-        if: steps.check_status.outputs.UPDATABLE
-        id: create_deb
-        run: |
-          git clone https://github.com/termux/termux-packages.git
-          cd termux-packages
+      # - name: Update Fancy
+        # if: steps.check_status.outputs.UPDATABLE
+        # id: create_deb
+        # run: |
+          # git clone https://github.com/termux/termux-packages.git
+          # cd termux-packages
           
-          for script in scripts/setup-{android-sdk,ubuntu}.sh
-            do [[ -x "$script" ]] && ./"$script"; done
+          # for script in scripts/setup-{android-sdk,ubuntu}.sh
+            # do [[ -x "$script" ]] && ./"$script"; done
           
-          : "${TERM:=xterm-256color}"
-          export TERM= ./build-package.sh \
-            -o "${{ steps.check_status.outputs.OUT_DIR }}" \
-              "${{ steps.check_status.outputs.MAIN_DIR }}"
+          # "${TERM:=xterm-256color}"
+          # export TERM= ./build-package.sh \
+            # -o "${{ steps.check_status.outputs.OUT_DIR }}" \
+              # "${{ steps.check_status.outputs.MAIN_DIR }}"
           
-          RELEASE_FILES=($(find "${{ steps.check_status.outputs.OUT_DIR }}" -mindepth 1 -type f))
-          if [[ "${#RELEASE_FILES[@]}" -gt 1 ]]; then
-            echo "RELEASE=true" >> "$GITHUB_OUTPUT"
-          fi
+          # RELEASE_FILES=($(find "${{ steps.check_status.outputs.OUT_DIR }}" -mindepth 1 -type f))
+          # if [[ "${#RELEASE_FILES[@]}" -gt 1 ]]; then
+            # echo "RELEASE=true" >> "$GITHUB_OUTPUT"
+          # fi
       
-      - name: Tag Release
-        if: steps.create_deb.outputs.RELEASE
-        run: |
-          cd "${{ steps.check_status.outputs.MAIN_DIR }}"
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-          git tag "v${{ steps.check_status.outputs.LATEST_VERSION }}"
-          git push origin "v${{ steps.check_status.outputs.LATEST_VERSION }}"
+      # - name: Tag Release
+        # if: steps.create_deb.outputs.RELEASE
+        # run: |
+          # cd "${{ steps.check_status.outputs.MAIN_DIR }}"
+          # git config user.name "github-actions"
+          # git config user.email "github-actions@github.com"
+          # git tag "v${{ steps.check_status.outputs.LATEST_VERSION }}"
+          # git push origin "v${{ steps.check_status.outputs.LATEST_VERSION }}"
           
-      - name: Publish Release
-        if: steps.create_deb.outputs.RELEASE
-        uses: softprops/action-gh-release@v2
-        with:
-          name: "Latest Release: version ${{ steps.check_status.outputs.LATEST_VERSION }}"
-          tag_name: "v${{ steps.check_status.outputs.LATEST_VERSION }}"
-          files: "${{ steps.check_status.outputs.OUT_DIR }}"/*
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # - name: Publish Release
+        # if: steps.create_deb.outputs.RELEASE
+        # uses: softprops/action-gh-release@v2
+        # with:
+          # name: "Latest Release: version ${{ steps.check_status.outputs.LATEST_VERSION }}"
+          # tag_name: "v${{ steps.check_status.outputs.LATEST_VERSION }}"
+          # files: "${{ steps.check_status.outputs.OUT_DIR }}"/*
+        # env:
+          # GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
