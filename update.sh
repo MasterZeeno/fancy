@@ -9,7 +9,7 @@ MAIN_DIR=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
 OUT_DIR="$MAIN_DIR/output"; rm -rf "$OUT_DIR"
 
 for v in {dist,src,build}.{owner,repo,email} {funcs,build}.sh; do
-  declare val condition=false
+  val="" condition=false
   if [[ $v =~ \.sh$ ]]; then
     val="$MAIN_DIR/$v"
     [[ -s "$val" ]] && condition=true
@@ -27,8 +27,9 @@ for v in {dist,src,build}.{owner,repo,email} {funcs,build}.sh; do
       return 1 2>/dev/null || exit 1
     fi
   fi
+  unset val var condition
 done
-unset val var condition
+
 source "$FUNCS_SH"
 
 if [[ "$(uname -o)" == "Android" && "${PREFIX:-}" == *"com.termux"* ]]; then
@@ -51,6 +52,7 @@ fi
 install_pkgs() {
   local old_args=("${FANCY_ARGS[@]}")
   local pkg retry status
+  echo
   
   while (($#)); do
     [[ -z "${1:-}" ]] && continue
@@ -73,9 +75,7 @@ install_pkgs() {
     fancy_print -n +d "Install $status:"
     fancy_print --print --no-icon +b "$pkg"
     
-    [[ "$status" == "failed" ]] && \
-      { return 1 2>/dev/null || exit 1; }
-    
+    [[ "$status" == "failed" ]] && exit 1
     shift
   done
   
@@ -85,32 +85,32 @@ install_pkgs() {
 get_ver() { ([[ -f "$1" ]] && cat "$1" || echo "$1") | grep -iom1 'version[ =].*' | grep -Eo '[0-9.]+'; }
 print_update_msg() {
   local msg="${1:?}" slp="${2:-0}" bmsg="$DIST_OWNER/$DIST_REPO"
-  [[ -z "${LATEST_VERSION:-}" ]] || bmsg+=" v$LATEST_VERSION"
+  [[ -z "${LATEST_VERSION:-}" ]] || bmsg+=" to v$LATEST_VERSION"
   
   FANCY_ARGS=(--no-print)
   [[ "${msg,,}" =~ ^updated ]] && \
     FANCY_ARGS+=(--preset=success) || \
       FANCY_ARGS+=(--color=36)
   
-  fancy_print -n +d "${msg^}" 
+  echo
+  fancy_print -n +d "${msg^}:" 
   fancy_print --print --no-icon +b "$bmsg"
   sleep "$slp.69"
 }
 
 build_fancy() {
-  for var in name email; do local val=$(git config --file "$MAIN_DIR/.cfg" user.$var)
-  for flag in global local; do git config --$flag user.$var "$val"; done; done
+  mkdir -p "$OUT_DIR"
+  gh_login
   
   git add .
   if ! git diff --cached --quiet; then
-    git commit --quiet -m "Latest: v$LATEST_VERSION"
-    git push --quiet origin
+    git commit --quiet -m "Bumped: v$LATEST_VER"
+    git push --quiet
   fi
   
-  mkdir -p "$OUT_DIR"
   [[ -d "$MAIN_DIR/$BUILD_REPO" ]] || \
     git clone "https://github.com/$BUILD_OWNER/$BUILD_REPO.git"
-  cd "$MAIN_DIR/$BUILD_REPO" && git pull --quiet
+  cd "$MAIN_DIR/$BUILD_REPO" && git pull &>/dev/null || exit 1
   
   export TERM="${TERM:-"xterm-256color"}"
   
@@ -123,35 +123,52 @@ build_fancy() {
 }
 
 gh_login() {
+  local status="success"
+  cd "$MAIN_DIR"
+  
   if [[ "$(gh api user --jq .login)" != "$DIST_OWNER" ]]; then
     gh auth logout &>/dev/null
     
+    for var in name email; do
+      local val=$(git config --file "$MAIN_DIR/.cfg" user.$var)
+      for flag in global local; do
+        [[ "$(git config --$flag user.$var)" != "$val" ]] \
+          && git config --$flag user.$var "$val"
+      done
+    done
+    
+    echo
     FANCY_ARGS=(--no-print --color=36)
     fancy_print +d -n "Logging into"
     fancy_print +b --print "Github"
     
-    local token try=0
-    while true; do fancy_print -n "*GH Auth Token: "; read -r token
-    token="${token//[^a-zA-Z0-9]/}"; [[ -n "$token" ]] && break; done
+    if [[ -z "${GH_TOKEN:-}" ]]; then
+      local token
+      while true; do
+        fancy_print -n "*GH Auth Token: "
+        read -r token
+        token="${token//[^a-zA-Z0-9]/}"
+        [[ -n "$token" ]] && break
+      done
+      export GH_TOKEN="$token"
+    fi
     
-    export GH_TOKEN="$token"
+    local try=0
     gh config set -h github.com git_protocol https
     while ! gh auth status &>/dev/null; do
-      echo "$token" | gh auth login --with-token &>/dev/null
-      ((try++)) && ((try>3)) && return 1
+      echo "$GH_TOKEN" | gh auth login --with-token &>/dev/null
+      ((try++)) && ((try>3)) && { status="failed"; break; }
     done
   fi
   
-  return 0
+  FANCY_ARGS=(--preset="$status" +b)
+  echo; fancy_print "Login $status"
+  [[ "$status" == "failed" ]] && exit 1
 }
 
 publish_fancy() {
   local tag="v${1:-$LATEST_VERSION}"
-  cd "$MAIN_DIR"
-  
-  local status="failed"; gh_login && status="success"
-  FANCY_ARGS=(--preset="$status" +b); fancy_print "Login $status"
-  [[ "$status" == "failed" ]] && { return 1 2>/dev/null || exit 1; }
+   gh_login
   
   if git ls-remote --tags origin | grep -q "refs/tags/$tag$"; then
     git tag | grep -q "^$tag$" && git tag -d "$tag"
@@ -163,7 +180,7 @@ publish_fancy() {
   git tag "$tag"
   git push --quiet origin "$tag"
   gh release create "$tag" \
-    --title "Latest: $tag" \
+    --title "$DIST_REPO $tag" \
     --target "$(git rev-parse HEAD)" \
     --repo "$DIST_OWNER/$DIST_REPO" >/dev/null
     
@@ -180,11 +197,11 @@ publish_fancy() {
 
 install_pkgs awk curl gh git grep sed sha256sum jq
 print_update_msg "checking updates for" 2
-git pull --quiet
+git pull &>/dev/null || exit 1
 
 SRC_TOML=$(curl -fsSL "https://raw.githubusercontent.com/$SRC_OWNER/$SRC_REPO/refs/heads/master/Cargo.toml")
 LATEST_VERSION=$(get_ver "$SRC_TOML") CURRENT_VERSION=0
-[[ "$1" == '-f' ]] || CURRENT_VERSION=$(get_ver "$BUILD_SH")
+[[ "$1" == '-f' || "$1" == '--force' ]] || CURRENT_VERSION=$(get_ver "$BUILD_SH")
 if ! printf '%s\n' "$CURRENT_VERSION" "$LATEST_VERSION" | sort -V | tail -n1 | grep -xq "$CURRENT_VERSION"; then
   print_update_msg "updating" 1
   SRC_ZIP_URL="https://github.com/$SRC_OWNER/$SRC_REPO/archive/refs/heads/master.zip"
@@ -200,9 +217,8 @@ if ! printf '%s\n' "$CURRENT_VERSION" "$LATEST_VERSION" | sort -V | tail -n1 | g
       breaks "$SRC_REPO" replaces "$SRC_REPO" build_in_src true auto_update true
   } | sed -E "/^_/!d; s|(.*)=|\Utermux_pkg\1=|;s|=(.*)|=\"\1\"|g" \
     | awk '{print length, $0}' | sort -nr | cut -d' ' -f2- > "$BUILD_SH"
-  
-  awk 'BEGIN{n=0}/^ *$/{n++}n>=1' "$FUNCS_SH" >> "$BUILD_SH"
-  [[ -s "$BUILD_SH" ]] && build_fancy
+    awk 'BEGIN{n=0}/^ *$/{n++}n>=1' "$FUNCS_SH" >> "$BUILD_SH"
+    [[ -s "$BUILD_SH" ]] && build_fancy
 fi
 
 print_update_msg "updated"
