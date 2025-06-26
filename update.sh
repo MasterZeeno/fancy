@@ -199,12 +199,12 @@ publish_fancy() {
 
 install_pkgs curl gh git jq
 print_update_msg "checking updates for" 2
-gh_login
+gh_login || true
 git pull &>/dev/null || exit 1
 
 SRC_TOML=$(curl -fsSL "https://raw.githubusercontent.com/$SRC_OWNER/$SRC_REPO/refs/heads/master/Cargo.toml")
 LATEST_VERSION=$(get_ver "$SRC_TOML") CURRENT_VERSION=0
-[[ "$1" == '-f' || "$1" == '--force' ]] || CURRENT_VERSION=$(get_ver "$BUILD_SH")
+[[ "$1" == '-f' ]] || CURRENT_VERSION=$(get_ver "$BUILD_SH")
 if ! printf '%s\n' "$CURRENT_VERSION" "$LATEST_VERSION" | sort -V | tail -n1 | grep -xq "$CURRENT_VERSION"; then
   print_update_msg "updating" 1
   SRC_ZIP_URL="https://github.com/$SRC_OWNER/$SRC_REPO/archive/refs/heads/master.zip"
@@ -221,7 +221,7 @@ if ! printf '%s\n' "$CURRENT_VERSION" "$LATEST_VERSION" | sort -V | tail -n1 | g
   } | sed -E "/^_/!d; s|(.*)=|\Utermux_pkg\1=|;s|=(.*)|=\"\1\"|g" \
     | awk '{print length, $0}' | sort -nr | cut -d' ' -f2- > "$BUILD_SH"
     # awk 'BEGIN{n=0}/^ *$/{n++}n>=1' "$FUNCS_SH" >> "$BUILD_SH"
-    command cat "$FUNCS_SH" >> "$BUILD_SH"
+    cat "$FUNCS_SH" >> "$BUILD_SH"
     [[ -s "$BUILD_SH" ]] && build_fancy
 fi
 
