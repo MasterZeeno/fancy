@@ -102,7 +102,7 @@ build_fancy() {
   mkdir -p "$OUT_DIR"
   gh_login
   
-  git add .
+  cd "$MAIN_DIR" && git add .
   if ! git diff --cached --quiet; then
     git commit --quiet -m "Bumped: v$LATEST_VER"
     git push --quiet
@@ -170,7 +170,7 @@ gh_login() {
 
 publish_fancy() {
   local tag="v${1:-$LATEST_VERSION}"
-   gh_login
+  gh_login && cd "$MAIN_DIR"
   
   if git ls-remote --tags origin | grep -q "refs/tags/$tag$"; then
     git tag | grep -q "^$tag$" && git tag -d "$tag"

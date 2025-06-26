@@ -108,7 +108,7 @@ termux_step_post_get_source() {
     done
   done
 
-  print_msg 'Starting build...'
+  print_msg 'Start building process...'
   echo
 }
 
