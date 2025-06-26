@@ -125,12 +125,13 @@ build_fancy() {
     elif command -v yay &>/dev/null; then
       $SUDO yay -S "${install_opts[@]}" "${packages[@]}" &>/dev/null
     else
+      cd "$MAIN_DIR"
       for package in "${packages[@]}"; do
+        [[ -d "$package" ]] && rm -rf "$package"
         git clone --quiet https://aur.archlinux.org/"$package"
         cd "$package" || exit 1
         makepkg -si --skippgpcheck "${install_opts[@]}" &>/dev/null
-        cd - || exit 1
-        rm -rf "$package"
+        cd "$MAIN_DIR" && rm -rf "$package"
       done
     fi
   fi
