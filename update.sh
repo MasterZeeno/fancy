@@ -90,7 +90,7 @@ install_pkgs() {
 get_ver() { ([[ -f "$1" ]] && cat "$1" || echo "$1") | grep -iom1 'version[ =].*' | grep -Eo '[0-9.]+'; }
 print_update_msg() {
   local msg="${1:?}" slp="${2:-0}" bmsg="$USER_NAME/$USER_REPO"
-  [[ -z "${LATEST_VERSION:-}" ]] || bmsg+=" to v$LATEST_VERSION"
+  # [[ -z "${LATEST_VERSION:-}" ]] || bmsg+=" to v$LATEST_VERSION"
   
   FANCY_ARGS=(--no-print)
   [[ "${msg,,}" =~ ^updated ]] && \
@@ -98,8 +98,16 @@ print_update_msg() {
       FANCY_ARGS+=(--color=36)
   
   echo
-  fancy_print -n +d "${msg^}:" 
-  fancy_print --print --no-icon +b "$bmsg"
+  fancy_print -n +d "${msg^}:"
+  FANCY_ARGS+=(--no-icon)
+  if [[ -z "${LATEST_VERSION:-}" ]]; then
+    fancy_print --print +b "$bmsg"
+  else
+    fancy_print -n +b "$bmsg"
+    fancy_print -n +d "to"
+    fancy_print --print +b "v$LATEST_VERSION"
+  fi
+    
   sleep "$slp.69"
   return 0
 }
@@ -215,9 +223,9 @@ publish_fancy() {
   cd "$MAIN_DIR"
   
   git rev-parse -q --verify "refs/tags/$tag" &>/dev/null \
-    && git push origin ":refs/tags/$tag"
-  git tag | grep -q "^$tag$" && git tag -d "$tag"
-  gh release view "$tag" &>/dev/null && gh release delete "$tag" -y
+    && git push origin ":refs/tags/$tag" &>/dev/null
+  git tag | grep -q "^$tag$" && git tag -d "$tag" &>/dev/null
+  gh release view "$tag" &>/dev/null && gh release delete "$tag" -y &>/dev/null
   
   git tag "$tag"
   git push --quiet origin "$tag"

@@ -183,7 +183,7 @@ termux_step_post_get_source() {
     done
   done
 
-  print_msg 'Successfully renamed package'
+  print_msg "Successfully rebranded '$SRC_REPO_NAME' to '$DIST_REPO_NAME'"
   echo
 }
 
@@ -191,7 +191,7 @@ termux_step_pre_configure() {
   termux_setup_rust
   : "${CARGO_HOME:=${HOME}/.cargo}"
   export CARGO_HOME
-  cargo fmt -- --check
+  cargo -q fmt -- --check
   cargo -q clippy --locked --all-targets
   cargo -q test --locked
   cargo -q fetch --locked --target "${CARGO_TARGET_NAME}"
