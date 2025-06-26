@@ -8,7 +8,7 @@ fi
 MAIN_DIR=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
 OUT_DIR="$MAIN_DIR/output" CFG="$MAIN_DIR/.config"
 
-for v in {user,src,build}.{name,repo,email} {funcs,build}.sh; do
+for v in {user,src,build}.{name,repo,email} {funcs,build,update}.sh; do
   val="" condition=false
   if [[ $v =~ \.sh$ ]]; then
     val="$MAIN_DIR/$v"
@@ -20,7 +20,7 @@ for v in {user,src,build}.{name,repo,email} {funcs,build}.sh; do
   
   if [[ "$condition" == "true" ]]; then
     var="${v/./_}"
-    declare "${var^^}=$val"
+    eval "${var^^}=$val"
   else
     if [[ $v =~ \.sh$ || $v =~ ^[usb]*(name|repo)$ || $v =~ ^u*email$ ]]; then
       echo "Variable '$var' is necessary, provide a valid value."
@@ -34,7 +34,7 @@ source "$FUNCS_SH"
 
 if [[ "$(uname -o)" == "Android" && "${PREFIX:-}" == *"com.termux"* ]]; then
   SUDO="" RUNNER="termux"
-  source "$PREFIX/bin/termux-setup-package-manager" || true
+  source "$PREFIX/bin/termux-setup-package-manager" &>/dev/null || true
 else
   [[ $(id -u) -eq 0 ]] || SUDO="sudo"
   if command -v apt &>/dev/null; then
@@ -238,7 +238,7 @@ update_script() {
   local after=$(git rev-parse HEAD)
   
   [[ "$before" == "$after" ]] && return
-  env ."$MAIN_DIR/update.sh" "${FORCE_UPDATE:-}"
+  env ."$UPDATE_SH" "${FORCE_UPDATE:-}"
   exit 0
 }
 
