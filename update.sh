@@ -110,37 +110,37 @@ build_fancy() {
   
   cd "$MAIN_DIR/$BUILD_REPO/scripts"
   
-  source properties.sh &>/dev/null || true
+  source properties.sh || true
   if [[ "$RUNNER" != "termux" ]]; then
     [[ ! -d "${NDK:-}" || ! -d "${ANDROID_HOME:-}" ]] \
-      && source setup-android-sdk.sh &>/dev/null || true
+      && source setup-android-sdk.sh || true
   fi
 
-  source setup-$RUNNER.sh &>/dev/null || true
-
   if [[ "$RUNNER" == "archlinux" ]]; then
+    $SUDO sed -i "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf
     install_pkgs base-devel libgit2 python-pip go lzip cmake git-lfs \
       multilib-devel fontconfig ttf-droid python-pyelftools android-tools android-udev
-    $SUDO sed -i "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf
     local -a packages=(
       ncurses5-compat-libs makedepend python2
       aosp-devel xml2 lineageos-devel lib32-ncurses5-compat-libs
     )
     local -a install_opts=(--noconfirm --needed)
     if command -v paru &>/dev/null; then
-      $SUDO paru -S "${install_opts[@]}" "${packages[@]}" &>/dev/null
+      $SUDO paru -S "${install_opts[@]}" "${packages[@]}"
     elif command -v yay &>/dev/null; then
-      $SUDO yay -S "${install_opts[@]}" "${packages[@]}" &>/dev/null
+      $SUDO yay -S "${install_opts[@]}" "${packages[@]}"
     else
       for package in "${packages[@]}"; do
         git clone --quiet https://aur.archlinux.org/"$package"
         cd "$package" || exit 1
-        makepkg -si --skippgpcheck "${install_opts[@]}" &>/dev/null
+        makepkg -si --skippgpcheck "${install_opts[@]}"
         cd - || exit 1
         rm -rf "$package"
       done
     fi
   fi
+
+  source setup-$RUNNER.sh || true
 
   cd "$MAIN_DIR/$BUILD_REPO" && ./clean.sh &>/dev/null
   
