@@ -110,15 +110,22 @@ build_fancy() {
   
   cd "$MAIN_DIR/$BUILD_REPO/scripts"
   
-  source properties.sh # &>/dev/null
+  source properties.sh &>/dev/null || true
   if [[ "$RUNNER" != "termux" ]]; then
     [[ ! -d "${NDK:-}" || ! -d "${ANDROID_HOME:-}" ]] \
-      && source setup-android-sdk.sh # &>/dev/null
+      && source setup-android-sdk.sh &>/dev/null || true
   fi
 
+  source setup-$RUNNER.sh &>/dev/null || true
+
   if [[ "$RUNNER" == "archlinux" ]]; then
+    install_pkgs base-devel libgit2 python-pip go lzip cmake git-lfs \
+      multilib-devel fontconfig ttf-droid python-pyelftools android-tools android-udev
     $SUDO sed -i "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf
-    local -a packages=(ncurses5-compat-libs makedepend python2)
+    local -a packages=(
+      ncurses5-compat-libs makedepend python2
+      aosp-devel xml2 lineageos-devel lib32-ncurses5-compat-libs
+    )
     local -a install_opts=(--noconfirm --needed)
     if command -v paru &>/dev/null; then
       $SUDO paru -S "${install_opts[@]}" "${packages[@]}" &>/dev/null
@@ -134,8 +141,6 @@ build_fancy() {
       done
     fi
   fi
-
-  source setup-$RUNNER.sh || true # &>/dev/null
 
   cd "$MAIN_DIR/$BUILD_REPO" && ./clean.sh &>/dev/null
   
