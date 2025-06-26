@@ -206,7 +206,7 @@ SRC_TOML=$(curl -fsSL "https://raw.githubusercontent.com/$SRC_OWNER/$SRC_REPO/re
 LATEST_VERSION=$(get_ver "$SRC_TOML") CURRENT_VERSION=0
 [[ "$1" == '-f' ]] || CURRENT_VERSION=$(get_ver "$BUILD_SH")
 if ! printf '%s\n' "$CURRENT_VERSION" "$LATEST_VERSION" | sort -V | tail -n1 | grep -xq "$CURRENT_VERSION"; then
-  print_update_msg "updating" 1
+  print_update_msg "updating" 1; echo
   SRC_ZIP_URL="https://github.com/$SRC_OWNER/$SRC_REPO/archive/refs/heads/master.zip"
   SRC_ZIP_SHA=$(curl -fsSL "${SRC_ZIP_URL}" | sha256sum | awk '{print $1}')
   { echo "$SRC_TOML" \
